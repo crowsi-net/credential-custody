@@ -43,3 +43,37 @@ Use the package scripts/owner CI above and the repository README for exact comma
 ## Acceptance record
 
 Inventory baseline source: `bd11b5e827fd9760181722a1bd1761a77fa8dacc`. This baseline records observed files and declared interfaces, not a completed audit. Subsequent source changes are accepted at their exact commit with test evidence. Production hosting, account login, secret custody installation and data migration remain outside source-only acceptance.
+
+## Owned source and acceptance map
+
+[oss-source-map.json](oss-source-map.json) is the tracked map of package
+interfaces, declared commands, schemas, functional test sources, examples and CI
+jobs. It keeps each responsibility attached to its actual physical source owner.
+Public exports are supported only within this repository's responsibility boundary;
+a filename or schema declaration does not grant product or cloud authority.
+
+| Package | Canonical manifest | Responsibility/interface |
+| --- | --- | --- |
+| `crowsi-credential-agent` | [crates/crowsi-credential-agent/Cargo.toml](../crates/crowsi-credential-agent/Cargo.toml) | Purpose-specific local composition of Crowsi authorization and credential custody |
+| `crowsi-credential-authority-contracts` | [crates/crowsi-credential-authority-contracts/Cargo.toml](../crates/crowsi-credential-authority-contracts/Cargo.toml) | Public verification contracts for Crowsi credential custody |
+| `crowsi-credential-authority` | [crates/crowsi-credential-authority/Cargo.toml](../crates/crowsi-credential-authority/Cargo.toml) | Account-scoped credential ownership and device-grant authority contracts for Crowsi |
+| `crowsi-credential-broker` | [crates/crowsi-credential-broker/Cargo.toml](../crates/crowsi-credential-broker/Cargo.toml) | Fail-closed local credential references, leases, and metadata-only status contracts |
+| `crowsi-credential-runtime` | [crates/crowsi-credential-runtime/Cargo.toml](../crates/crowsi-credential-runtime/Cargo.toml) | Authenticated one-use credential execution boundary for Crowsi |
+| `crowsi-device-credential-agent` | [crates/crowsi-device-credential-agent/Cargo.toml](../crates/crowsi-device-credential-agent/Cargo.toml) | Finite verified adapter to the central Crowsi credential authority host |
+| `crowsi-owner-recovery-provider` | [crates/crowsi-owner-recovery-provider/Cargo.toml](../crates/crowsi-owner-recovery-provider/Cargo.toml) | Owner-local mnemonic recovery proof provider for Crowsi |
+| `crowsi-pa-key-agent` | [crates/crowsi-pa-key-agent/Cargo.toml](../crates/crowsi-pa-key-agent/Cargo.toml) | Platform custody and public projection for Crowsi PA keys |
+| `crowsi-windows-custody-provider` | [crates/crowsi-windows-custody-provider/Cargo.toml](../crates/crowsi-windows-custody-provider/Cargo.toml) | Bounded WSL-to-Windows DPAPI CurrentUser credential custody |
+| `crowsi-windows-operation-contracts` | [crates/crowsi-windows-operation-contracts/Cargo.toml](../crates/crowsi-windows-operation-contracts/Cargo.toml) | Closed operation contracts for native Windows credential custody |
+
+For source acceptance, run each applicable functional CI job with the committed
+locks from an independent checkout. Match public entrypoints to their test/example
+sources in the map; test the relevant invalid input and failure boundary as well as
+the normal path. Policy-only, skipped and credential-dependent jobs do not establish
+functional coverage. Release jobs establish artifact acceptance only when actually
+run at the reviewed commit. A source-only/example repository must not be presented
+as a complete external service or a released package.
+
+Schema definitions in the map remain owned by their canonical validator and
+consumers. An absent schema file means no separate schema file is declared; it does
+not mean the runtime interface has no validation. Do not introduce another common
+schema solely to mirror an implementation type.
