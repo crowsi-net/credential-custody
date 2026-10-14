@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "repository": "crowsi-net/credential-custody",
+  "defaultBranch": "main",
+  "requiredWorkflows": [
+    "ci.yml"
+  ],
+  "packages": [
+    {
+      "ecosystem": "cargo",
+      "manifest": "crates/crowsi-credential-authority-contracts/Cargo.toml",
+      "name": "crowsi-credential-authority-contracts",
+      "installDirectory": "."
+    },
+    {
+      "ecosystem": "cargo",
+      "manifest": "crates/crowsi-credential-broker/Cargo.toml",
+      "name": "crowsi-credential-broker",
+      "installDirectory": "."
+    },
+    {
+      "ecosystem": "cargo",
+      "manifest": "crates/crowsi-credential-runtime/Cargo.toml",
+      "name": "crowsi-credential-runtime",
+      "installDirectory": "."
+    },
+    {
+      "ecosystem": "cargo",
+      "manifest": "crates/crowsi-windows-custody-provider/Cargo.toml",
+      "name": "crowsi-windows-custody-provider",
+      "installDirectory": "."
+    },
+    {
+      "ecosystem": "cargo",
+      "manifest": "crates/crowsi-windows-operation-contracts/Cargo.toml",
+      "name": "crowsi-windows-operation-contracts",
+      "installDirectory": "."
+    }
+  ]
+}

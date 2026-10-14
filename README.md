@@ -25,3 +25,6 @@ cargo +1.97 test --locked --workspace --doc --all-features
 Each crate README and examples describe its public API. Tests and examples use synthetic state; they do not install an authority, service or maintenance timer. Authority, broker, enforcement, independent verification and recovery retain separate roles. Existing wire/schema identifiers and publish=false declarations are unchanged. Repository relocation does not imply a new registry release. Original public history and license notices are preserved in docs/source-history.
 
 [OSS responsibility and source completion](docs/oss-source-contract.md) defines the supported package boundary and required acceptance. It does not declare unexecuted source, distribution or production checks complete.
+
+Dependency updates: [repository policy](docs/dependency-updates.md).
+Registry releases: [version tags and GitHub OIDC](docs/registry-release.md).

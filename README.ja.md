@@ -10,3 +10,6 @@ cargo +1.97 test --locked --workspace --doc --all-features
 ```
 
 テストは合成入力で実施し、実account・service・timerへの配置は行いません。
+
+Dependency updates: [repository policy](docs/dependency-updates.md).
+Registry releases: [version tags and GitHub OIDC](docs/registry-release.md).
