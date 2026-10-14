@@ -18,7 +18,7 @@ test-support = []
 [dependencies]
 crowsi-authority-transport = { version = "=0.1.0" }
 crowsi-credential-authority-contracts = { version = "=0.10.0", path = "../crowsi-credential-authority-contracts" }
-ed25519-dalek = "=2.2.0"
+ed25519-dalek = "=3.0.0"
 hex = "=0.4.3"
 getrandom = "=0.3.4"
 libc = "=0.2.190"
