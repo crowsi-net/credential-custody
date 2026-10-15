@@ -12,7 +12,7 @@ publish = ["crates-io"]
 autotests = false
 
 [dependencies]
-ed25519-dalek = "=2.2.0"
+ed25519-dalek = "=3.0.0"
 hex = "=0.4.3"
 ihat-identity-assertion-contracts = { version = "=0.10.0" }
 serde = { version = "=1.0.229", features = ["derive"] }
