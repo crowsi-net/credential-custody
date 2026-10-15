@@ -51,4 +51,4 @@ clients; `MemoryFrameTransport` is available only for tests or the explicit
 
 ## Product responsibility
 
-This component is maintained in [vpremises/vpremises-credential](https://github.com/vpremises/vpremises-credential). Use the [product README](../../README.md) for composition, use cases and trust boundaries.
+This component is maintained in [crowsi-net/credential-custody](https://github.com/crowsi-net/credential-custody). Use the [repository README](../../README.md) for composition, use cases and trust boundaries.
