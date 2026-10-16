@@ -46,6 +46,10 @@ node --experimental-strip-types scripts/acceptance/local.mts push
 
 `run` executes fmt, strict Clippy, the real namespace bootstrap first, every
 remaining workspace test target through the portable command, then doctests.
+This is the Linux profile: the existing `windows-dpapi-live` target requires a
+Windows PE and interactive user profile and is explicitly recorded NOT EXECUTED.
+Its ordinary contract tests still run. Do not count that native case as passed;
+the receipt requires the exact declared exception, not an arbitrary skip list.
 The early bootstrap catches capability/mount failures before expensive suites.
 Failure, timeout, ignored/filtered tests,
 empty evidence or source changes prevents receipt creation. Logs remain ignored

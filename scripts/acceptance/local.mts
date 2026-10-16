@@ -5,6 +5,7 @@ import { release } from 'node:os'
 import { commands, successfulTests } from './commands.mts'
 import { clean, git, sourceDigest } from './source.mts'
 import { verifyReceipt, type Receipt } from './receipt.mts'
+import { notExecuted } from './profile.mts'
 
 const mode = process.argv[2]
 if (process.argv.length !== 3 || !['run', 'verify', 'push'].includes(mode ?? '')) throw Error('Usage: local.mts run|verify|push')
@@ -13,7 +14,7 @@ if (mode === 'run') {
   if (process.platform !== 'linux' || process.getuid?.() === 0) throw Error('Use a non-root Linux account; no sudo or host changes')
   const receipt: Receipt = {
     schema: 'crowsi-local-acceptance-v1', sourceCommit: git('rev-parse', 'HEAD'), sourceSha256: sourceDigest(),
-    executedAt: new Date().toISOString(), platform: 'linux', kernel: release(), results: []
+    executedAt: new Date().toISOString(), platform: 'linux', kernel: release(), notExecuted, results: []
   }
   mkdirSync('.local/acceptance', { recursive: true, mode: 0o700 })
   for (const [index, argv] of commands.entries()) {

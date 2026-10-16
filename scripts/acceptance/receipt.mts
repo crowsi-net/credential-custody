@@ -1,16 +1,19 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { commands } from './commands.mts'
 import { git, sourceDigest } from './source.mts'
+import { notExecuted } from './profile.mts'
 
 export interface Receipt {
   schema: 'crowsi-local-acceptance-v1'; sourceCommit: string; sourceSha256: string
   executedAt: string; platform: 'linux'; kernel: string
+  notExecuted: typeof notExecuted
   results: { argv: readonly string[]; exitCode: 0; logSha256: string; passed: number | null }[]
 }
 export function validateReceipt(value: unknown, digest: string): asserts value is Receipt {
   const r = value as Receipt
   if (!r || r.schema !== 'crowsi-local-acceptance-v1' || r.platform !== 'linux' ||
-      Object.keys(r).sort().join(',') !== 'executedAt,kernel,platform,results,schema,sourceCommit,sourceSha256' ||
+      Object.keys(r).sort().join(',') !== 'executedAt,kernel,notExecuted,platform,results,schema,sourceCommit,sourceSha256' ||
+      JSON.stringify(r.notExecuted) !== JSON.stringify(notExecuted) ||
       !/^[a-f0-9]{40}$/.test(r.sourceCommit) || r.sourceSha256 !== digest ||
       !Number.isFinite(Date.parse(r.executedAt)) || typeof r.kernel !== 'string' || !/^[a-z0-9._+-]{1,120}$/i.test(r.kernel) ||
       !Array.isArray(r.results) || r.results.length !== commands.length) throw Error('Invalid/stale local receipt')
