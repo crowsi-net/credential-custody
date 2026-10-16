@@ -14,7 +14,7 @@ publish = false
 [dependencies]
 crowsi-credential-authority-contracts = { version = "=0.10.0", path = "../crowsi-credential-authority-contracts" }
 ed25519-dalek = "=3.0.0"
-getrandom = "=0.2.17"
+getrandom = "=0.4.3"
 hex = "=0.4.3"
 ihat-identity-assertion-contracts = { version = "=0.10.0" }
 pbkdf2 = "=0.12.2"

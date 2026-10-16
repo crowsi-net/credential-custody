@@ -27,7 +27,7 @@ secret-transport = "anonymous-stdio"
 crowsi-windows-operation-contracts = { version = "=0.1.0", path = "../crowsi-windows-operation-contracts", optional = true }
 base64 = "=0.23.1"
 ed25519-dalek = "=3.0.0"
-getrandom = "=0.3.4"
+getrandom = "=0.4.3"
 hex = "=0.4.3"
 ihat-identity-assertion-contracts = { version = "=0.10.0", optional = true }
 serde = { version = "1.0.228", features = ["derive"] }

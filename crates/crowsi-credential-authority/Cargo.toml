@@ -20,7 +20,7 @@ crowsi-authority-transport = { version = "=0.2.0", git = "https://github.com/cro
 crowsi-credential-authority-contracts = { version = "=0.10.0", path = "../crowsi-credential-authority-contracts" }
 ed25519-dalek = "=3.0.0"
 hex = "=0.4.3"
-getrandom = "=0.3.4"
+getrandom = "=0.4.3"
 libc = "=0.2.190"
 ihat-identity-assertion-contracts = { version = "=0.10.0" }
 nix = { version = "0.29.0", features = ["fs", "process", "signal", "user"] }
