@@ -11,4 +11,4 @@ if (!targets?.some(t => t.name === 'production_bootstrap')) throw Error('Local a
 for (const target of targets.filter(t => t.name !== 'production_bootstrap')) {
   run(['test', '--locked', '-p', agent, '--test', target.name, '--all-features'])
 }
-console.log('Portable targets executed. production_bootstrap NOT RUN here; requires separately reviewed local evidence.')
+console.log('Portable targets executed. production_bootstrap NOT RUN by this command; see separate local execution evidence.')

@@ -17,6 +17,7 @@ test('local receipt rejects stale source and incomplete or changed checks', () =
   assert.throws(() => validateReceipt(changed, digest))
   const empty = valid(); empty.results[2]!.passed = 0
   assert.throws(() => validateReceipt(empty, digest))
+  assert.throws(() => validateReceipt({ ...valid(), hostname: 'synthetic' }, digest))
 })
 test('test evidence rejects missing, ignored, filtered and empty runs', () => {
   const summary = 'test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out'

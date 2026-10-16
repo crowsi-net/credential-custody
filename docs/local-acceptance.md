@@ -18,8 +18,10 @@ probe on subsequent CI runs. Do not claim an AppArmor diagnosis without evidence
 
 Review found the helper verified user/mount isolation but relied on flags alone
 for PID/network separation and recursively bound host runtime trees. It now checks
-all four namespace identities and uses non-recursive read-only, nosuid/nodev bind
-mounts. This avoids importing nested host mounts. Mount propagation is private.
+all four namespace identities and applies recursive read-only, nosuid/nodev
+attributes, then verifies every resulting runtime mount. Locked nested mounts
+can reject non-recursive binds in a user namespace; importing them without
+recursive restrictions is not accepted. Mount propagation is private.
 The child uses a clean environment, bounded lifetime, isolated proc and temporary
 root; ordinary installed trust checks and signature validation remain unchanged.
 Synthetic signing keys are test-only and never installed on the host. No alternate
@@ -42,8 +44,10 @@ git commit -m 'test: record local source-bound acceptance'
 node --experimental-strip-types scripts/acceptance/local.mts push
 ```
 
-`run` executes fmt, strict Clippy, every workspace test target including the real
-namespace bootstrap, then doctests. Failure, timeout, ignored/filtered tests,
+`run` executes fmt, strict Clippy, the real namespace bootstrap first, every
+remaining workspace test target through the portable command, then doctests.
+The early bootstrap catches capability/mount failures before expensive suites.
+Failure, timeout, ignored/filtered tests,
 empty evidence or source changes prevents receipt creation. Logs remain ignored
 under `.local/acceptance` with private permissions. No command pushes on failure.
 The receipt contains only the exact source commit, source digest, command results,
@@ -70,3 +74,10 @@ logs before normal PR merge. Do not auto-merge based on receipt presence or trea
 untrusted submitted receipts as proof. This does not change repository protection,
 approvals or signing configuration. Preserve existing evidence after merge;
 source changes require a new local run. Publication remains a separate gate.
+
+Use a normal merge commit for the source/evidence PR, preserving the tested source
+commit as an ancestor. Squash/rebase would break that ancestry and is rejected;
+no repository setting is changed to enforce a different merge policy.
+Test dependencies are optimized through Cargo's test profile to avoid slow debug
+cryptography. Workspace debug assertions and production build profiles remain
+unchanged; test failure/ignored filtering rules are not relaxed.

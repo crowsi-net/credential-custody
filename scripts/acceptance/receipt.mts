@@ -10,11 +10,13 @@ export interface Receipt {
 export function validateReceipt(value: unknown, digest: string): asserts value is Receipt {
   const r = value as Receipt
   if (!r || r.schema !== 'crowsi-local-acceptance-v1' || r.platform !== 'linux' ||
+      Object.keys(r).sort().join(',') !== 'executedAt,kernel,platform,results,schema,sourceCommit,sourceSha256' ||
       !/^[a-f0-9]{40}$/.test(r.sourceCommit) || r.sourceSha256 !== digest ||
-      !Number.isFinite(Date.parse(r.executedAt)) || typeof r.kernel !== 'string' ||
+      !Number.isFinite(Date.parse(r.executedAt)) || typeof r.kernel !== 'string' || !/^[a-z0-9._+-]{1,120}$/i.test(r.kernel) ||
       !Array.isArray(r.results) || r.results.length !== commands.length) throw Error('Invalid/stale local receipt')
   r.results.forEach((row, index) => {
-    if (!row || row.exitCode !== 0 || JSON.stringify(row.argv) !== JSON.stringify(commands[index]) ||
+    if (!row || Object.keys(row).sort().join(',') !== 'argv,exitCode,logSha256,passed' ||
+        row.exitCode !== 0 || JSON.stringify(row.argv) !== JSON.stringify(commands[index]) ||
         !/^[a-f0-9]{64}$/.test(row.logSha256) || (index >= 2
           ? !Number.isSafeInteger(row.passed) || Number(row.passed) <= 0 : row.passed !== null)) {
       throw Error('Incomplete or changed local acceptance command')

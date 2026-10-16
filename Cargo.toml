@@ -1,3 +1,7 @@
 [workspace]
 members = ["crates/*"]
 resolver = "3"
+
+# Keep workspace assertions/debug checks; avoid slow debug crypto in local acceptance.
+[profile.test.package."*"]
+opt-level = 2
