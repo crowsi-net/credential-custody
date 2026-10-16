@@ -1,6 +1,6 @@
 import { closeSync, constants, fstatSync, openSync, readdirSync, readFileSync } from 'node:fs'
 import { commands } from './commands.mts'
-import { git, sourceDigest } from './source.mts'
+import { sourceDigest } from './source.mts'
 import { notExecuted } from './profile.mts'
 
 export interface Receipt {
@@ -41,8 +41,6 @@ export function verifyReceipt(): string {
     if (candidate.sourceSha256 !== digest) continue
     validateReceipt(value, digest)
     if (name !== `${value.sourceCommit}.json`) throw Error('Receipt/source identity mismatch')
-    git('merge-base', '--is-ancestor', value.sourceCommit, 'HEAD')
-    if (sourceDigest(value.sourceCommit) !== digest) throw Error('Claimed source commit has different content')
     return name
   }
   throw Error('No local execution receipt matches this source; run locally before push')

@@ -65,12 +65,15 @@ this is an owner workflow, not a machine-wide hook or a new GitHub permission ru
 ## Remote acceptance and trust
 
 The SHA256 digest covers the canonical Git path/mode/blob manifest of every
-tracked regular file except evidence receipts, checked at both source and head;
+tracked regular file except evidence receipts, recorded after execution and
+recomputed at the reviewed head;
 only bounded regular JSON receipts with the declared filename are excluded.
 Symlinks and executable source hidden under the evidence directory are refused;
 receipt reads use no-follow file descriptors and a size bound.
 changing code, tests, workflow or this policy invalidates older evidence. The
-recorded source commit must be an ancestor of the reviewed head. CI detects stale,
+recorded source commit labels the operator's checkout; the content digest is the
+acceptance anchor, so squash/rebase metadata alone does not invalidate it.
+CI detects stale,
 missing or incomplete evidence and runs all portable targets. It explicitly marks
 `production_bootstrap` as not executed on the hosted runner; it is never ignored
 inside a supposedly complete remote test invocation.
@@ -83,9 +86,9 @@ untrusted submitted receipts as proof. This does not change repository protectio
 approvals or signing configuration. Preserve existing evidence after merge;
 source changes require a new local run. Publication remains a separate gate.
 
-Use a normal merge commit for the source/evidence PR, preserving the tested source
-commit as an ancestor. Squash/rebase would break that ancestry and is rejected;
-no repository setting is changed to enforce a different merge policy.
+Use the normal PR merge method required by the existing branch protection.
+Squash/rebase is supported when source content is unchanged; any actual source
+change requires new local evidence. No branch protection is relaxed.
 Test dependencies are optimized through Cargo's test profile to avoid slow debug
 cryptography. Workspace debug assertions and production build profiles remain
 unchanged; test failure/ignored filtering rules are not relaxed.
