@@ -12,6 +12,8 @@ mod config_host;
 mod fixture;
 #[path = "gateway_host_subprocess/identity.rs"]
 mod identity;
+#[path = "gateway_host_subprocess/isolation.rs"]
+mod isolation;
 #[path = "gateway_host_subprocess/process.rs"]
 mod process;
 #[path = "gateway_host_subprocess/process_run.rs"]
