@@ -3,7 +3,7 @@ import { execFileSync, spawnSync } from 'node:child_process'
 import { mkdirSync, readdirSync, writeFileSync } from 'node:fs'
 import { release } from 'node:os'
 import { commands, successfulTests } from './commands.mts'
-import { clean, git, sourceDigest } from './source.mts'
+import { clean, git, reviewBranch, sourceDigest } from './source.mts'
 import { verifyReceipt, type Receipt } from './receipt.mts'
 import { notExecuted } from './profile.mts'
 
@@ -37,6 +37,7 @@ if (mode === 'run') {
   writeFileSync(`acceptance/evidence/${receipt.sourceCommit}.json`, JSON.stringify(receipt, null, 2) + '\n', { flag: 'wx' })
   console.log('Commit the receipt, review its source binding, then run local.mts push. Nothing pushed.')
 } else {
+  if (mode === 'push') reviewBranch(git('branch', '--show-current'))
   console.log(`Matching local receipt: ${verifyReceipt()}; execution claim requires maintainer review`)
   if (mode === 'push') execFileSync('git', ['push', 'origin', 'HEAD'], { stdio: 'inherit' })
 }

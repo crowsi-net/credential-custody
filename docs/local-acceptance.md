@@ -60,6 +60,7 @@ test totals, kernel version and log hashes; no hostname, account identity, paths
 credentials or log bodies. Commit it without editing source, then `push` checks
 the clean tree and digest again before pushing the current branch to origin.
 It never creates tags or publishes packages. Direct `git push` remains possible;
+the wrapper refuses protected `main` and detached HEAD, so use a review branch.
 this is an owner workflow, not a machine-wide hook or a new GitHub permission rule.
 
 ## Remote acceptance and trust

@@ -25,3 +25,6 @@ export function sourceDigest(): string {
 export function clean(): void {
   if (git('status', '--porcelain', '--untracked-files=all')) throw Error('Commit source/evidence first; worktree must be clean')
 }
+export function reviewBranch(branch: string): void {
+  if (!branch || branch === 'main') throw Error('Push a review branch, never protected main or detached HEAD')
+}
