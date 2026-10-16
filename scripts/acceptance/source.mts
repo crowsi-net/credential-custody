@@ -28,3 +28,7 @@ export function clean(): void {
 export function reviewBranch(branch: string): void {
   if (!branch || branch === 'main') throw Error('Push a review branch, never protected main or detached HEAD')
 }
+export function pushArgs(branch: string): string[] {
+  reviewBranch(branch)
+  return ['push', '--no-follow-tags', 'origin', `HEAD:refs/heads/${branch}`]
+}

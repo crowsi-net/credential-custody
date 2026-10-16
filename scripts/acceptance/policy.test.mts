@@ -3,15 +3,15 @@ import assert from 'node:assert/strict'
 import { commands, successfulTests } from './commands.mts'
 import { validateReceipt } from './receipt.mts'
 import { notExecuted } from './profile.mts'
-import { reviewBranch } from './source.mts'
+import { pushArgs } from './source.mts'
 const digest = 'a'.repeat(64)
 const valid = () => ({ schema: 'crowsi-local-acceptance-v1', sourceCommit: 'b'.repeat(40), sourceSha256: digest,
   executedAt: '2026-10-16T00:00:00Z', platform: 'linux', kernel: 'synthetic-kernel', notExecuted,
   results: commands.map((argv, index) => ({ argv: [...argv] as string[], exitCode: 0, logSha256: 'c'.repeat(64), passed: index >= 2 ? 4 : null })) })
 test('the push flow rejects protected main and detached HEAD before any network write', () => {
-  assert.throws(() => reviewBranch('main'))
-  assert.throws(() => reviewBranch(''))
-  reviewBranch('test/local-acceptance')
+  assert.throws(() => pushArgs('main'))
+  assert.throws(() => pushArgs(''))
+  assert.deepEqual(pushArgs('test/local-acceptance'), ['push', '--no-follow-tags', 'origin', 'HEAD:refs/heads/test/local-acceptance'])
 })
 test('local receipt rejects stale source and incomplete or changed checks', () => {
   validateReceipt(valid(), digest)
