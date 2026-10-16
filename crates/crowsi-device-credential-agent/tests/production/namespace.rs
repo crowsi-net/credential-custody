@@ -10,6 +10,10 @@ use wait_timeout::ChildExt;
 impl Installation {
     pub fn run(&self, operation: &str) -> std::process::Output {
         let host_before = host_trust_metadata();
+        let ready = self.root.join("case/namespace-ready");
+        if ready.exists() {
+            fs::remove_file(&ready).expect("remove only previous namespace readiness marker");
+        }
         let user = fs::read_link("/proc/self/ns/user").expect("isolated bootstrap setup");
         let mount = fs::read_link("/proc/self/ns/mnt").expect("isolated bootstrap setup");
         let mut child = Command::new("/usr/bin/unshare")
@@ -46,6 +50,18 @@ impl Installation {
         }
         let output = child.wait_with_output().expect("isolated bootstrap setup");
         assert_eq!(host_before, host_trust_metadata(), "host trust changed");
+        assert!(
+            ready.is_file(),
+            "namespace setup failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        assert!(
+            output.status.success()
+                || output
+                    .stderr
+                    .starts_with(b"crowsi-device-credential-agent: "),
+            "isolated runtime did not execute the ordinary product CLI"
+        );
         output
     }
 }

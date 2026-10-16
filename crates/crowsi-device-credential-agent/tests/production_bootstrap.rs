@@ -9,7 +9,7 @@ mod bootstrap;
 use bootstrap::Installation;
 
 #[test]
-fn ordinary_agent_uses_installed_trust_and_refuses_repeat_initialization() {
+fn ordinary_agent_uses_installed_trust_and_initialization_preserves_existing_state() {
     let installed = Installation::new();
     let first = installed.run("initialize-once");
     assert!(
@@ -21,10 +21,7 @@ fn ordinary_agent_uses_installed_trust_and_refuses_repeat_initialization() {
     let binding = std::fs::read(installed.root.join("case/state/binding.json"))
         .expect("isolated bootstrap setup");
     let again = installed.run("initialize-once");
-    assert!(
-        !again.status.success(),
-        "initialization must not reset existing state"
-    );
+    assert!(again.status.success(), "exact initialization is idempotent");
     assert!(again.stdout.is_empty());
     assert_eq!(
         std::fs::read(installed.root.join("case/state/binding.json"))

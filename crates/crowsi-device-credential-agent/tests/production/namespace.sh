@@ -17,7 +17,7 @@ mount --make-rslave "$root/usr"
 mount -o remount,bind,ro "$root/usr"
 for directory in lib lib64 bin sbin; do
   if test -L "/$directory"; then
-    ln -s "$(readlink "/$directory")" "$root/$directory"
+    ln -sfnT "$(readlink "/$directory")" "$root/$directory"
   elif test -d "/$directory"; then
     mkdir -p "$root/$directory"
     mount --rbind "/$directory" "$root/$directory"
@@ -25,4 +25,5 @@ for directory in lib lib64 bin sbin; do
   fi
 done
 mount -t proc proc "$root/proc"
+printf 'isolated-installation-ready\n' > "$root/case/namespace-ready"
 exec /usr/sbin/chroot "$root" /app/agent "$command" --config /case/config.json

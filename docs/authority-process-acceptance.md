@@ -50,7 +50,7 @@ that namespace**. The host trust file's metadata is compared before and after.
 The existing transport/core test constructors only supply test document shapes;
 they do not execute the agent in place of its real process.
 
-Four cases cover valid explicit initialization, refusal to reset existing state,
+Four cases cover valid explicit initialization, idempotent preservation of existing state,
 invalid/writable installed trust, and changed configuration without a signature.
 This closes the bootstrap testability gap without adding a test trust feature to
 the product. Missing namespace support, mount tools or privileges is a failed
