@@ -29,6 +29,22 @@ pub(crate) fn initialize(fixture: &Fixture, documents: &Documents) {
 }
 
 pub(crate) fn run(fixture: &Fixture, documents: &Documents, command: &str, wire: &[u8]) -> Vec<u8> {
+    let output = try_run(fixture, documents, command, wire);
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert!(output.stderr.is_empty());
+    output.stdout
+}
+
+pub(crate) fn try_run(
+    fixture: &Fixture,
+    documents: &Documents,
+    command: &str,
+    wire: &[u8],
+) -> std::process::Output {
     let mut child = Command::new(fixture.path("crowsi-credential-authority-host"))
         .args([
             "handle-once",
@@ -64,12 +80,5 @@ pub(crate) fn run(fixture: &Fixture, documents: &Documents, command: &str, wire:
         let _ = child.wait();
         panic!("finite authority host timed out");
     }
-    let output = child.wait_with_output().expect("host output");
-    assert!(
-        output.status.success(),
-        "{}",
-        String::from_utf8_lossy(&output.stderr)
-    );
-    assert!(output.stderr.is_empty());
-    output.stdout
+    child.wait_with_output().expect("host output")
 }

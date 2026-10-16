@@ -5,10 +5,12 @@ use std::{
     fs,
     os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
+    sync::{Mutex, MutexGuard},
     time::{SystemTime, UNIX_EPOCH},
 };
 
 pub(crate) struct Fixture {
+    _isolation: MutexGuard<'static, ()>,
     _directory: tempfile::TempDir,
     pub(crate) root: PathBuf,
     pub(crate) store: PathBuf,
@@ -24,8 +26,15 @@ pub(crate) struct Fixture {
     pub(crate) now: u64,
 }
 
+// Each case verifies finite process deadlines; parallel binary hashing would
+// compete with those deadlines rather than test independent authority stores.
+static PROCESS_CASE: Mutex<()> = Mutex::new(());
+
 impl Fixture {
     pub(crate) fn new() -> Self {
+        let isolation = PROCESS_CASE
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         // Private ancestry is part of the production trust boundary: /tmp is unsuitable.
         let private_directory = tempfile::Builder::new()
             .prefix(".authority-host-")
@@ -33,6 +42,7 @@ impl Fixture {
             .expect("owner-private fixture");
         let root = private_directory.path().to_path_buf();
         let value = Self {
+            _isolation: isolation,
             _directory: private_directory,
             store: root.join("store"),
             authority_anchor: root.join("authority-anchor"),
