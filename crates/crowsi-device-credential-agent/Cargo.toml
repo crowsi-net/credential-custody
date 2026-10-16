@@ -19,7 +19,7 @@ crowsi-credential-authority-contracts = { version = "=0.10.0", path = "../crowsi
 crowsi-authority-transport = { version = "=0.2.0", git = "https://github.com/crowsi-net/crowsi-transport-foundation", rev = "30bcd1e14cad837755cfc524097ca6133d32c8d3" }
 crowsi-windows-operation-contracts = { version = "=0.1.0", path = "../crowsi-windows-operation-contracts" }
 ed25519-dalek = "=3.0.0"
-getrandom = "=0.2.17"
+getrandom = "=0.4.3"
 hex = "=0.4.3"
 ihat-identity-assertion-contracts = { version = "=0.10.0" }
 libc = "=0.2.190"
