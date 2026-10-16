@@ -44,7 +44,8 @@ git commit -m 'test: record local source-bound acceptance'
 node --experimental-strip-types scripts/acceptance/local.mts push
 ```
 
-`run` executes fmt, strict Clippy, the real namespace bootstrap first, every
+`run` first checks the admission-policy regressions, then executes fmt, strict
+Clippy, the real namespace bootstrap first, every
 remaining workspace test target through the portable command, then doctests.
 This is the Linux profile: the existing `windows-dpapi-live` target requires a
 Windows PE and interactive user profile and is explicitly recorded NOT EXECUTED.
@@ -65,6 +66,9 @@ this is an owner workflow, not a machine-wide hook or a new GitHub permission ru
 
 The SHA256 digest covers the canonical Git path/mode/blob manifest of every
 tracked regular file except evidence receipts, checked at both source and head;
+only bounded regular JSON receipts with the declared filename are excluded.
+Symlinks and executable source hidden under the evidence directory are refused;
+receipt reads use no-follow file descriptors and a size bound.
 changing code, tests, workflow or this policy invalidates older evidence. The
 recorded source commit must be an ancestor of the reviewed head. CI detects stale,
 missing or incomplete evidence and runs all portable targets. It explicitly marks

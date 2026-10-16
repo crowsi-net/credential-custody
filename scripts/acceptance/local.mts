@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import { execFileSync, spawnSync } from 'node:child_process'
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readdirSync, writeFileSync } from 'node:fs'
 import { release } from 'node:os'
 import { commands, successfulTests } from './commands.mts'
 import { clean, git, sourceDigest } from './source.mts'
@@ -12,6 +12,10 @@ if (process.argv.length !== 3 || !['run', 'verify', 'push'].includes(mode ?? '')
 clean()
 if (mode === 'run') {
   if (process.platform !== 'linux' || process.getuid?.() === 0) throw Error('Use a non-root Linux account; no sudo or host changes')
+  const tests = readdirSync('scripts/acceptance').filter(name => name.endsWith('.test.mts')).sort()
+  if (!tests.length) throw Error('Acceptance policy tests missing')
+  execFileSync(process.execPath, ['--experimental-strip-types', '--test', ...tests.map(name => `scripts/acceptance/${name}`)],
+    { stdio: 'inherit', timeout: 60_000 })
   const receipt: Receipt = {
     schema: 'crowsi-local-acceptance-v1', sourceCommit: git('rev-parse', 'HEAD'), sourceSha256: sourceDigest(),
     executedAt: new Date().toISOString(), platform: 'linux', kernel: release(), notExecuted, results: []

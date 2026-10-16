@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs'
+import { closeSync, constants, fstatSync, openSync, readdirSync, readFileSync } from 'node:fs'
 import { commands } from './commands.mts'
 import { git, sourceDigest } from './source.mts'
 import { notExecuted } from './profile.mts'
@@ -30,7 +30,13 @@ export function verifyReceipt(): string {
   const digest = sourceDigest()
   const files = readdirSync('acceptance/evidence').filter(name => /^[a-f0-9]{40}\.json$/.test(name))
   for (const name of files) {
-    const value: unknown = JSON.parse(readFileSync(`acceptance/evidence/${name}`, 'utf8'))
+    const fd = openSync(`acceptance/evidence/${name}`, constants.O_RDONLY | constants.O_NOFOLLOW)
+    let value: unknown
+    try {
+      const stat = fstatSync(fd)
+      if (!stat.isFile() || stat.size > 16_384) throw Error('Receipt must be a bounded regular file')
+      value = JSON.parse(readFileSync(fd, 'utf8'))
+    } finally { closeSync(fd) }
     const candidate = value as Receipt
     if (candidate.sourceSha256 !== digest) continue
     validateReceipt(value, digest)

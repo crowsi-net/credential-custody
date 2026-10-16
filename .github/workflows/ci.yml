@@ -28,7 +28,7 @@ jobs:
       - run: cargo +1.97 clippy --locked --workspace --all-targets --all-features -- -D warnings
       - name: Verify reviewed local execution evidence (does not execute namespace tests)
         run: |
-          node --experimental-strip-types --test scripts/acceptance/policy.test.mts
+          node --experimental-strip-types --test scripts/acceptance/*.test.mts
           node --experimental-strip-types scripts/acceptance/local.mts verify
       - name: Run portable tests; namespace acceptance is a separate local execution
         run: node --experimental-strip-types scripts/acceptance/portable.mts
