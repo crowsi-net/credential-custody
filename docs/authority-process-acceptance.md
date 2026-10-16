@@ -31,7 +31,6 @@ Six tests in this target are **not** the six product journeys from #118.
 Remaining product acceptance needs actual endpoint-agent and identity/provider
 processes, transport authentication, revocation/session/grant use, copied
 endpoint state, stale evidence, provider scope refusal and independent recovery.
-The agent currently reads root trust from `/etc` even in its test-support build.
 Its in-process fake transports are useful unit tests, not a substitute for these
 journeys. No fixture is named `production_multidevice.rs` merely to satisfy an
 old file-presence check. Keep #118 open until the real journeys pass.
@@ -39,3 +38,24 @@ old file-presence check. Keep #118 open until the real journeys pass.
 The repository's existing all-features CI runs this registered integration
 target. Development results, source merge and any artifact publication are
 separate acceptance states.
+
+## Ordinary agent bootstrap in an isolated installation
+
+`crowsi-device-credential-agent` registers `production_bootstrap` as a mandatory
+integration target. It runs the ordinary CLI binary, with no alternate trust
+path, injected core or production authentication branch. A permanent test harness
+creates fresh Linux user, mount, PID and network namespaces and a private root
+filesystem. Synthetic installation trust is at the real `/etc/crowsi` path **in
+that namespace**. The host trust file's metadata is compared before and after.
+The existing transport/core test constructors only supply test document shapes;
+they do not execute the agent in place of its real process.
+
+Four cases cover valid explicit initialization, idempotent preservation of existing state,
+invalid/writable installed trust, and changed configuration without a signature.
+This closes the bootstrap testability gap without adding a test trust feature to
+the product. Missing namespace support, mount tools or privileges is a failed
+prerequisite, never a skipped/passed product acceptance. No Docker, host mount,
+sysctl, package installation or persistent permission change is performed.
+
+Both target suites test lower boundaries. They do not yet test the complete
+endpoint → authenticated transport → authority → provider/recovery journeys.

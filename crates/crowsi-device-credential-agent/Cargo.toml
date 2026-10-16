@@ -78,3 +78,7 @@ required-features = ["test-support"]
 [[test]]
 name = "production_surface"
 path = "tests/production_surface.rs"
+
+[[test]]
+name = "production_bootstrap"
+path = "tests/production_bootstrap.rs"
