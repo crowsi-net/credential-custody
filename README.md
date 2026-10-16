@@ -26,5 +26,8 @@ Each crate README and examples describe its public API. Tests and examples use s
 
 [OSS responsibility and source completion](docs/oss-source-contract.md) defines the supported package boundary and required acceptance. It does not declare unexecuted source, distribution or production checks complete.
 
+[Local execution and remote review](docs/local-acceptance.md) defines the required
+source-bound local namespace acceptance before push and normal PR merge.
+
 Dependency updates: [repository policy](docs/dependency-updates.md).
 Registry releases: [version tags and GitHub OIDC](docs/registry-release.md).

@@ -16,6 +16,8 @@ impl Installation {
         }
         let user = fs::read_link("/proc/self/ns/user").expect("isolated bootstrap setup");
         let mount = fs::read_link("/proc/self/ns/mnt").expect("isolated bootstrap setup");
+        let network = fs::read_link("/proc/self/ns/net").expect("isolated bootstrap setup");
+        let pid = fs::read_link("/proc/self/ns/pid").expect("isolated bootstrap setup");
         let mut child = Command::new("/usr/bin/unshare")
             .args([
                 "--user",
@@ -32,6 +34,8 @@ impl Installation {
             .arg(operation)
             .arg(user)
             .arg(mount)
+            .arg(network)
+            .arg(pid)
             .env_clear()
             .env("PATH", "/usr/bin:/bin")
             .stdin(Stdio::null())
