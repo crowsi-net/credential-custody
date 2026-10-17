@@ -1,5 +1,12 @@
-crowsi-windows-custody-provider
+credential-custody
 Copyright 2026 HAT Inc.
-Licensed under the Apache License, Version 2.0; see LICENSE.
 
-Earlier permissions and attribution remain in the accompanying LICENSE-* files.
+This workspace contains the Crowsi credential agent, authority and contracts,
+broker, runtime, device agent, owner recovery provider, PA key agent and Windows
+custody/operation components. Current workspace crate declarations use
+Apache-2.0; see LICENSE and each component's Cargo.toml and accompanying notices.
+
+The repository name and this workspace-level notice do not replace individual
+component notices or change earlier permissions. Original and third-party
+attribution remains in the accompanying LICENSE-* files and preserved source
+notices, including imported historical material.

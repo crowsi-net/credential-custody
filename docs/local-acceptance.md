@@ -27,7 +27,7 @@ root; ordinary installed trust checks and signature validation remain unchanged.
 Synthetic signing keys are test-only and never installed on the host. No alternate
 trust feature, production fallback, host /etc write, privilege grant, sudo, sysctl
 or AppArmor relaxation is introduced. These tests are not a full kernel sandbox
-proof or the six multidevice journeys required by coela-release #118.
+proof or the complete multi-device product journeys.
 
 ## Operator flow
 

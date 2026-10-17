@@ -4,7 +4,8 @@ This source candidate admits only `crowsi-net/crowsi-transport-foundation@30bcd1
 authority transport 0.2.0 with Rustls 0.23.46. Normal dependencies remain exact
 official registry dependencies. This one immutable public source exception avoids
 the vulnerable exact TLS dependency in published 0.1.0 until its owner completes
-the official 0.2.0 registry release (coela-oss/coela-release#123).
+the official 0.2.0 registry release and its independent archive acceptance.
+See the [owner registry release policy](registry-release.md).
 
 The public Rust signing key type changes from Dalek 2 to Dalek 3. This consumer
 uses the current type directly; no key conversion, legacy decoder or permissive

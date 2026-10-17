@@ -1,7 +1,7 @@
 # Authority process acceptance
 
-This is a partial development acceptance for coela-release #118, not the
-six-scenario endpoint/provider product acceptance. No credential is installed,
+This is a partial development acceptance of authority process boundaries, not
+the six-scenario endpoint/provider product acceptance. No credential is installed,
 no host `/etc` path is modified, and no real identity or provider is contacted.
 
 Run the existing owner target:
@@ -26,14 +26,15 @@ release builds; it locates fixture trust beside the signed configuration.
 | Existing state absent | Read request refuses instead of initializing/registering an authority | Does not implement or accept legacy re-enrollment |
 
 The existing two cases also test a signed snapshot and a signed peer head.
-Six tests in this target are **not** the six product journeys from #118.
+Six tests in this target are **not** the six end-to-end product journeys.
 
 Remaining product acceptance needs actual endpoint-agent and identity/provider
 processes, transport authentication, revocation/session/grant use, copied
 endpoint state, stale evidence, provider scope refusal and independent recovery.
 Its in-process fake transports are useful unit tests, not a substitute for these
 journeys. No fixture is named `production_multidevice.rs` merely to satisfy an
-old file-presence check. Keep #118 open until the real journeys pass.
+old file-presence check. The complete product acceptance remains unfinished
+until the real journeys pass.
 
 The repository's existing all-features CI runs this registered integration
 target. Development results, source merge and any artifact publication are
