@@ -1,0 +1,87 @@
+{
+  "schema": "crowsi-local-acceptance-v1",
+  "sourceCommit": "b25c69d3f5d3df4a85263b415acd43acaa5af3f4",
+  "sourceSha256": "18d1a18432953c10a9b011dfd625077b35f46fb899431427833e6b0eb6691104",
+  "executedAt": "2026-10-17T02:29:14.918Z",
+  "platform": "linux",
+  "kernel": "6.18.33.2-microsoft-standard-WSL2",
+  "notExecuted": [
+    {
+      "package": "crowsi-windows-custody-provider",
+      "target": "windows-dpapi-live",
+      "reason": "requires-Windows-PE-and-interactive-DPAPI-user-profile"
+    }
+  ],
+  "results": [
+    {
+      "argv": [
+        "cargo",
+        "+1.97",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": null
+    },
+    {
+      "argv": [
+        "cargo",
+        "+1.97",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--all-features",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exitCode": 0,
+      "logSha256": "00c9c3dc36a8b27bc2349078cda55fd2b9726bd8d961fa7a974a793c8150bb00",
+      "passed": null
+    },
+    {
+      "argv": [
+        "cargo",
+        "+1.97",
+        "test",
+        "--locked",
+        "-p",
+        "crowsi-device-credential-agent",
+        "--test",
+        "production_bootstrap",
+        "--all-features"
+      ],
+      "exitCode": 0,
+      "logSha256": "e6505f77a5543431466ef9e4cf8da300bcf022b94f41bf81508eb7ee5585ebc3",
+      "passed": 4
+    },
+    {
+      "argv": [
+        "node",
+        "--experimental-strip-types",
+        "scripts/acceptance/portable.mts"
+      ],
+      "exitCode": 0,
+      "logSha256": "fb4e8de9694191ae63402e948fcf5b8c5283ad143273d2fee397579b8710dc92",
+      "passed": 625
+    },
+    {
+      "argv": [
+        "cargo",
+        "+1.97",
+        "test",
+        "--locked",
+        "--workspace",
+        "--doc",
+        "--all-features"
+      ],
+      "exitCode": 0,
+      "logSha256": "b9276ccd3e61b62291a2f05b5a7b2d1fd4bc8be39de117d197efe0c9582b7cba",
+      "passed": 2
+    }
+  ]
+}
