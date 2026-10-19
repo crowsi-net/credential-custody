@@ -1,0 +1,96 @@
+{
+  "schema": "crowsi-local-acceptance-v1",
+  "sourceCommit": "0da148c17a651bd97b1d46d15a3fd4aed9fc61cc",
+  "sourceSha256": "bfdc33709d34976e83014cb4c1b0d976b6572dee35089c173c4557d412ccad24",
+  "executedAt": "2026-10-19T14:02:51.342Z",
+  "platform": "linux",
+  "kernel": "6.18.33.2-microsoft-standard-WSL2",
+  "notExecuted": [
+    {
+      "package": "crowsi-windows-custody-provider",
+      "target": "windows-dpapi-live",
+      "reason": "requires-Windows-PE-and-interactive-DPAPI-user-profile"
+    }
+  ],
+  "results": [
+    {
+      "argv": [
+        "cargo",
+        "+1.97",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": null
+    },
+    {
+      "argv": [
+        "cargo",
+        "+1.97",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--all-features",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exitCode": 0,
+      "logSha256": "69d56ca0ec966dbdf28391e3387cb1d9a65ed630dbbe4556803ad46b9b29cbc4",
+      "passed": null
+    },
+    {
+      "argv": [
+        "cargo",
+        "+1.97",
+        "test",
+        "--locked",
+        "-p",
+        "crowsi-device-credential-agent",
+        "--test",
+        "production_bootstrap",
+        "--all-features"
+      ],
+      "exitCode": 0,
+      "logSha256": "66d7233d31d14d20e743ffe7c9f269c49312c6316e92d93a3480dcdeba741c29",
+      "passed": 4
+    },
+    {
+      "argv": [
+        "node",
+        "--experimental-strip-types",
+        "scripts/acceptance/portable.mts"
+      ],
+      "exitCode": 0,
+      "logSha256": "df71d4bf4ceb0ed66ae38438c9f7fe8793e1bb71d473194f8b0c333c2a903a3e",
+      "passed": 628
+    },
+    {
+      "argv": [
+        "cargo",
+        "+1.97",
+        "test",
+        "--locked",
+        "--workspace",
+        "--doc",
+        "--all-features"
+      ],
+      "exitCode": 0,
+      "logSha256": "d72a755a9b8178d0f4d1c182c76adac1cd5ee0aa395d2bd8d063745186d6975d",
+      "passed": 2
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/acceptance/linux-keyring.sh"
+      ],
+      "exitCode": 0,
+      "logSha256": "cc794fe7681ea03bf4ac8b5ae5c165d2f5513fe563e0ef7c1054ba43af3f98fc",
+      "passed": 6
+    }
+  ]
+}
