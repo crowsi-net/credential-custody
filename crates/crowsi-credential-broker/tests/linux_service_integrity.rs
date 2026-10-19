@@ -1,70 +1,92 @@
 use crowsi_credential_broker::{BrokerError, CredentialStore, LinuxCustodyStore, SecretRef};
-use oo7::dbus::Service;
+use gio::prelude::*;
+use libsecret::{
+    Collection, CollectionFlags, Item, ItemCreateFlags, SearchFlags, Service, ServiceFlags, Value,
+    prelude::*,
+};
 use sha2::{Digest, Sha256};
+use std::collections::HashMap;
 
 pub fn verify(store: &LinuxCustodyStore, reference: &SecretRef) {
-    let runtime = tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .expect("test runtime");
-    runtime.block_on(async {
-        let service = Service::encrypted().await.expect("test service");
-        let collection = service
-            .with_alias("default")
-            .await
-            .expect("alias lookup")
-            .expect("collection");
-        let attributes = [
-            (
-                "application".to_owned(),
-                "crowsi-credential-broker-v1".to_owned(),
-            ),
-            (
-                "slot".to_owned(),
-                hex::encode(Sha256::digest(reference.canonical_id().as_bytes())),
-            ),
-        ];
-        let item = collection
-            .search_items(&attributes)
-            .await
-            .expect("slot")
-            .pop()
-            .expect("one item");
-        let original = item.secret().await.expect("synthetic envelope");
-        item.set_secret(oo7::Secret::blob(b"not-an-envelope"))
-            .await
-            .expect("corruption setup");
-        assert!(matches!(
-            store.metadata(reference),
-            Err(BrokerError::InvalidEncoding)
-        ));
-        let mut wrong: serde_json::Value =
-            serde_json::from_slice(original.as_bytes()).expect("synthetic JSON");
-        wrong["reference"] = serde_json::Value::String("wrong-reference".into());
-        item.set_secret(oo7::Secret::blob(
-            serde_json::to_vec(&wrong).expect("synthetic JSON"),
-        ))
-        .await
-        .expect("substitution setup");
-        assert!(matches!(
-            store.metadata(reference),
-            Err(BrokerError::AccessDenied)
-        ));
-        item.set_secret(original.clone())
-            .await
-            .expect("restore synthetic envelope");
-        let duplicate = collection
-            .create_item("synthetic duplicate", &attributes, original, false, None)
-            .await
-            .expect("duplicate setup");
-        assert!(matches!(
-            store.metadata(reference),
-            Err(BrokerError::AccessDenied)
-        ));
-        duplicate
-            .delete(None)
-            .await
-            .expect("remove synthetic duplicate");
-        assert!(store.metadata(reference).is_ok());
-    });
+    let context = glib::MainContext::new();
+    context
+        .with_thread_default(|| {
+            context.block_on(async {
+                let service =
+                    Service::open_future(Service::static_type(), None, ServiceFlags::OPEN_SESSION)
+                        .await
+                        .expect("test provider");
+                let collection =
+                    Collection::for_alias_future(Some(&service), "default", CollectionFlags::NONE)
+                        .await
+                        .expect("test alias")
+                        .expect("collection");
+                let slot = hex::encode(Sha256::digest(reference.canonical_id().as_bytes()));
+                let attributes = HashMap::from([
+                    ("application", "crowsi-credential-broker-v1"),
+                    ("slot", slot.as_str()),
+                ]);
+                let item = collection
+                    .search_future(None, attributes, SearchFlags::ALL)
+                    .await
+                    .expect("slot")
+                    .pop()
+                    .expect("item");
+                item.load_secret_future().await.expect("synthetic secret");
+                let original = item.secret().expect("synthetic envelope");
+                item.set_secret_future(&Value::new("not-an-envelope", "application/json"))
+                    .await
+                    .expect("corruption setup");
+                assert!(matches!(
+                    store.metadata(reference),
+                    Err(BrokerError::InvalidEncoding)
+                ));
+                assert!(matches!(
+                    store.delete(reference),
+                    Err(BrokerError::InvalidEncoding)
+                ));
+                let mut wrong: serde_json::Value =
+                    serde_json::from_slice(&original.get()).expect("synthetic JSON");
+                wrong["reference"] = serde_json::Value::String("wrong-reference".into());
+                let encoded = serde_json::to_string(&wrong).expect("synthetic JSON");
+                item.set_secret_future(&Value::new(&encoded, "application/json"))
+                    .await
+                    .expect("substitution");
+                assert!(matches!(
+                    store.metadata(reference),
+                    Err(BrokerError::AccessDenied)
+                ));
+                assert!(matches!(
+                    store.delete(reference),
+                    Err(BrokerError::AccessDenied)
+                ));
+                item.set_secret_future(&original)
+                    .await
+                    .expect("restore synthetic envelope");
+                let attrs = HashMap::from([
+                    ("application".into(), "crowsi-credential-broker-v1"),
+                    ("slot".into(), slot.as_str()),
+                ]);
+                let duplicate = Item::create_future(
+                    &collection,
+                    None,
+                    attrs,
+                    "synthetic duplicate",
+                    &original,
+                    ItemCreateFlags::NONE,
+                )
+                .await
+                .expect("duplicate setup");
+                assert!(matches!(
+                    store.metadata(reference),
+                    Err(BrokerError::AccessDenied)
+                ));
+                duplicate
+                    .delete_future()
+                    .await
+                    .expect("remove synthetic duplicate");
+                assert!(store.metadata(reference).is_ok());
+            })
+        })
+        .expect("test thread context");
 }

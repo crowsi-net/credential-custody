@@ -3,7 +3,7 @@
 ## Linux Secret Service
 
 The optional Linux broker adapter delegates persistence, encryption and unlock to
-the selected OS provider through `oo7`. The DPAPI/CNG guarantees below describe
+the selected OS provider through GNOME’s `libsecret` Rust binding. The DPAPI/CNG guarantees below describe
 the Windows provider, not this Linux backend. See [Linux custody](docs/linux-credential-custody.md)
 for dependency selection, runtime prerequisites, failure handling and limitations.
 

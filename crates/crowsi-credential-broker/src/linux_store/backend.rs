@@ -1,49 +1,82 @@
-use oo7::dbus::{Collection, Item, Service};
-use sha2::{Digest, Sha256};
-
 use crate::{BrokerError, CredentialEntry, Result, SecretRef, custody_codec};
+use gio::prelude::*;
+use libsecret::{
+    Collection, CollectionFlags, Item, SearchFlags, Service, ServiceFlags, prelude::*,
+};
+use sha2::{Digest, Sha256};
+use std::collections::HashMap;
+use zeroize::Zeroizing;
 
-pub(super) struct Backend(pub(super) Collection);
+pub(super) struct Backend {
+    pub(super) service: Service,
+    pub(super) collection: Collection,
+}
 
-pub(super) fn provider_error(_: oo7::dbus::Error) -> BrokerError {
-    // Do not propagate provider messages, object paths or secret-bearing details.
+pub(super) fn provider_error(_: glib::Error) -> BrokerError {
     BrokerError::BackendUnavailable
 }
 
-fn attributes(reference: &SecretRef) -> [(String, String); 2] {
-    [
+pub(super) fn attributes(reference: &SecretRef) -> HashMap<String, String> {
+    HashMap::from([
         ("application".into(), "crowsi-credential-broker-v1".into()),
         (
             "slot".into(),
             hex::encode(Sha256::digest(reference.canonical_id().as_bytes())),
         ),
-    ]
+    ])
 }
 
 impl Backend {
     pub(super) async fn connect(alias: &str) -> Result<Self> {
-        // Explicit encrypted DBus transport; no automatic file/plain fallback.
-        let service = Service::encrypted().await.map_err(provider_error)?;
-        Ok(Self(
-            service
-                .with_alias(alias)
+        let service =
+            Service::open_future(Service::static_type(), None, ServiceFlags::OPEN_SESSION)
                 .await
-                .map_err(provider_error)?
-                .ok_or(BrokerError::BackendUnavailable)?,
-        ))
+                .map_err(provider_error)?;
+        let collection = Collection::for_alias_future(Some(&service), alias, CollectionFlags::NONE)
+            .await
+            .map_err(provider_error)?
+            .ok_or(BrokerError::BackendUnavailable)?;
+        Ok(Self {
+            service,
+            collection,
+        })
+    }
+
+    pub(super) async fn locked(&self) -> Result<bool> {
+        // Read live state rather than trusting a cached GObject property.
+        let parameters = ("org.freedesktop.Secret.Collection", "Locked").to_variant();
+        let value = self
+            .collection
+            .call_future(
+                "org.freedesktop.DBus.Properties.Get",
+                Some(&parameters),
+                gio::DBusCallFlags::NO_AUTO_START,
+                30_000,
+            )
+            .await
+            .map_err(provider_error)?;
+        value
+            .get::<(glib::Variant,)>()
+            .and_then(|(value,)| value.get::<bool>())
+            .ok_or(BrokerError::BackendUnavailable)
     }
 
     pub(super) async fn unlocked(&self) -> Result<()> {
-        if self.0.is_locked().await.map_err(provider_error)? {
+        if self.locked().await? {
             return Err(BrokerError::BackendDenied);
         }
         Ok(())
     }
 
     pub(super) async fn item(&self, reference: &SecretRef) -> Result<Option<Item>> {
+        let attributes = attributes(reference);
+        let lookup = attributes
+            .iter()
+            .map(|(k, v)| (k.as_str(), v.as_str()))
+            .collect();
         let mut items = self
-            .0
-            .search_items(&attributes(reference))
+            .collection
+            .search_future(None, lookup, SearchFlags::ALL)
             .await
             .map_err(provider_error)?;
         if items.len() > 1 {
@@ -59,46 +92,16 @@ impl Backend {
     ) -> Result<CredentialEntry> {
         self.unlocked().await?;
         let item = self.item(reference).await?.ok_or(BrokerError::NotFound)?;
-        if item.is_locked().await.map_err(provider_error)? {
+        if item.is_locked() {
             return Err(BrokerError::BackendDenied);
         }
-        let secret = item.secret().await.map_err(provider_error)?;
-        if secret.as_bytes().len() > 256 * 1024 {
+        item.load_secret_future().await.map_err(provider_error)?;
+        let secret = item.secret().ok_or(BrokerError::BackendUnavailable)?;
+        let bytes = Zeroizing::new(secret.get());
+        if bytes.len() > 256 * 1024 {
             return Err(BrokerError::InvalidEncoding);
         }
-        let payload =
-            std::str::from_utf8(secret.as_bytes()).map_err(|_| BrokerError::InvalidEncoding)?;
+        let payload = std::str::from_utf8(&bytes).map_err(|_| BrokerError::InvalidEncoding)?;
         custody_codec::decode(reference, revision, payload)
-    }
-
-    pub(super) async fn put(&self, entry: CredentialEntry) -> Result<()> {
-        self.unlocked().await?;
-        let metadata = entry.metadata();
-        let reference = metadata.reference();
-        if self.item(reference).await?.is_some()
-            && self.read(reference, None).await?.metadata().revision() == metadata.revision()
-        {
-            return Err(BrokerError::CredentialChanged);
-        }
-        let payload = custody_codec::encode(&entry)?;
-        self.0
-            .create_item(
-                "Crowsi credential",
-                &attributes(reference),
-                oo7::Secret::blob(payload.as_bytes()),
-                true,
-                None,
-            )
-            .await
-            .map_err(provider_error)?;
-        // Acknowledge only after reading back exactly what was written.
-        let read_back = self
-            .read(reference, Some(metadata.revision().as_str()))
-            .await
-            .map_err(|_| BrokerError::BackendUnavailable)?;
-        if *custody_codec::encode(&read_back)? != *payload {
-            return Err(BrokerError::BackendUnavailable);
-        }
-        Ok(())
     }
 }

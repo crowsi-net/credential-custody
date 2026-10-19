@@ -31,26 +31,6 @@ fn isolated_provider_acceptance() {
         ));
         return;
     }
-    let runtime = tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .expect("runtime");
-    runtime.block_on(async {
-        let service = oo7::dbus::Service::encrypted()
-            .await
-            .expect("provider protocol");
-        let collection = service
-            .with_alias("default")
-            .await
-            .expect("provider alias")
-            .expect("existing collection");
-        assert!(
-            !collection
-                .is_locked()
-                .await
-                .expect("provider direct lock state")
-        );
-    });
     let store = LinuxCustodyStore::connect("default").expect("isolated keyring service");
     assert!(!store.is_locked().expect("provider status"));
     store

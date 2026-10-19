@@ -7,19 +7,26 @@ and unlock prompts to an existing OS Secret Service. Crowsi does not implement a
 vault file format, cipher, password KDF, master-password cache or recovery cipher.
 It does not enable a daemon, provision a collection or import real credentials.
 
-The stable `oo7` Rust crate is maintained by linux-credentials and used in GNOME's
-credential infrastructure. GNOME's [project report](https://blogs.gnome.org/tbernard/2025/04/11/gnome-stf-2024/)
-describes this integration; [upstream source](https://github.com/linux-credentials/oo7)
-and [API documentation](https://docs.rs/oo7/0.6.0/oo7/) identify its MIT license and
-supported backends. This is a platform security component, not a claim that this
-exact release has an independent audit, certification or vendor support SLA.
-Re-evaluate ownership, advisories, Rust support, maintenance and license on update.
+The stable `libsecret` Rust crate is provided by GNOME's
+[libsecret-rs project](https://gitlab.gnome.org/World/Rust/libsecret-rs). It is the
+safe Rust binding to [GNOME libsecret](https://gitlab.gnome.org/GNOME/libsecret/),
+not an independently assembled crypto implementation. The Rust binding is MIT;
+the native libsecret library is LGPL-2.1-or-later. GLib/GIO and libsecret own the
+local DBus connection, secret session negotiation, storage and unlock prompt.
+This selection does not assert certification or an independent audit of the
+exact selected release. Review ownership, advisories, native-library policy,
+supported Rust versions, maintenance and licenses on update.
 
-Use an explicit encrypted DBus session (`Service::encrypted`) and existing
-collection alias. Automatic-backend selection, file storage, unstable API,
-plain sessions and tracing are not used. `native_crypto` is upstream protocol
-implementation; Crowsi does not assemble its primitives. No fallback creates a
-plaintext store when DBus, encryption or the provider fails.
+The initial oo7 candidate was rejected by RustSec audit on 2026-10-19: its DBus
+stack still depended on three crates marked unmaintained on 2026-10-16
+(RUSTSEC-2026-0370/0371/0372). No advisory exceptions or local upstream forks were
+introduced. A famous direct dependency alone does not qualify its entire graph.
+
+Build the optional adapter with the OS's `libsecret-1-dev` package (Debian/Ubuntu)
+and existing GLib/GIO development dependencies. No native-library detection is
+bypassed or replaced with invented SDK metadata. The Linux user authorizes any
+local package installation; CI provisions its own native build dependencies.
+No Crowsi file backend, custom cipher/KDF or plaintext-storage fallback is used.
 
 ## Use and trust boundary
 
@@ -79,6 +86,9 @@ Cargo.lock records the tested dependency closure. Dependabot checks Cargo and
 Actions daily, with security-update PRs separate from routine version updates.
 Repository settings must enable both alerts and automatic security-update PRs.
 Feature-enabled CI, RustSec audit and actual provider acceptance precede merge.
+RustSec also runs daily in this owner repository; that scheduled run does not run
+the heavy workspace tests. It rejects maintenance warnings as well as known
+vulnerabilities, including advisories that do not create a Dependabot alert.
 No auto-merge or publication is configured. An alert without an available fix
 remains for investigation rather than being suppressed.
 

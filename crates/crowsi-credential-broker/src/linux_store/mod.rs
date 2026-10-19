@@ -2,6 +2,7 @@
 mod backend;
 mod operations;
 mod transport;
+mod worker;
 
 use std::sync::Mutex;
 

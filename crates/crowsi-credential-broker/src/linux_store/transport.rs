@@ -2,7 +2,7 @@ use std::{sync::mpsc, thread, time::Duration};
 
 use crate::{BrokerError, CredentialEntry, Result, SecretRef};
 
-use super::backend::Backend;
+use super::worker;
 
 const DEADLINE: Duration = Duration::from_secs(40);
 
@@ -21,7 +21,7 @@ pub(super) enum Response {
     Entry(CredentialEntry),
 }
 
-type Message = (Operation, mpsc::SyncSender<Result<Response>>);
+pub(super) type Message = (Operation, mpsc::SyncSender<Result<Response>>);
 
 pub(super) struct Transport {
     sender: Option<mpsc::SyncSender<Message>>,
@@ -43,32 +43,7 @@ impl Transport {
         let (ready, startup) = mpsc::sync_channel(1);
         thread::Builder::new()
             .name("crowsi-secret-service".to_owned())
-            .spawn(move || {
-                let Ok(runtime) = tokio::runtime::Builder::new_current_thread()
-                    .enable_all()
-                    .build()
-                else {
-                    let _ = ready.send(Err(BrokerError::BackendUnavailable));
-                    return;
-                };
-                let backend = match runtime.block_on(bounded(Backend::connect(&alias))) {
-                    Ok(backend) => backend,
-                    Err(error) => {
-                        let _ = ready.send(Err(error));
-                        return;
-                    }
-                };
-                if ready.send(Ok(())).is_err() {
-                    return;
-                }
-                while let Ok((operation, reply)) = receiver.recv() {
-                    let result = runtime.block_on(bounded(backend.execute(operation)));
-                    let unavailable = matches!(result, Err(BrokerError::BackendUnavailable));
-                    if reply.send(result).is_err() || unavailable {
-                        break;
-                    }
-                }
-            })
+            .spawn(move || worker::run(alias, receiver, ready))
             .map_err(|_| BrokerError::BackendUnavailable)?;
         startup
             .recv_timeout(DEADLINE)
@@ -98,12 +73,6 @@ impl Transport {
         }
         result
     }
-}
-
-async fn bounded<T>(operation: impl std::future::Future<Output = Result<T>>) -> Result<T> {
-    tokio::time::timeout(Duration::from_secs(35), operation)
-        .await
-        .map_err(|_| BrokerError::BackendUnavailable)?
 }
 
 #[cfg(test)]
