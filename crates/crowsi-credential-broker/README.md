@@ -6,6 +6,8 @@ Keep credentials in custody and lend their use through a narrowly scoped, one-us
 
 - Register and resolve opaque credential references.
 - Limit credential use to an authorized purpose.
+- Use an existing Linux Secret Service through the optional `linux-secret-service`
+  feature; see [provider selection and failure behavior](../../docs/linux-credential-custody.md).
 
 ## Current scope
 

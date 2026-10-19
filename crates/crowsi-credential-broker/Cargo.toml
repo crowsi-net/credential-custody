@@ -30,6 +30,14 @@ sha2 = "0.10.9"
 thiserror = "2.0.18"
 zeroize = "=1.8.2"
 
+[features]
+linux-secret-service = ["dep:libsecret", "dep:glib", "dep:gio"]
+
+[target.'cfg(target_os = "linux")'.dependencies]
+libsecret = { version = "0.9.0", optional = true }
+glib = { version = "0.22.0", optional = true }
+gio = { version = "0.22.0", optional = true }
+
 [dev-dependencies]
 tempfile = "3.27.0"
 
@@ -48,3 +56,8 @@ path = "tests/harnesses/contracts.rs"
 [[test]]
 name = "ipc"
 path = "tests/harnesses/ipc.rs"
+
+[[test]]
+name = "linux-secret-service"
+path = "tests/linux_secret_service.rs"
+required-features = ["linux-secret-service"]

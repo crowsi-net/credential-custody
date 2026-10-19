@@ -3,10 +3,14 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    - cron: '20 20 * * *'
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
   verify:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
@@ -24,6 +28,10 @@ jobs:
         run: git bundle verify docs/source-history/source.bundle
       - name: Diagnose namespace capability without changing host protection
         run: sh scripts/acceptance/diagnose.sh
+      - name: Install native keyring build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends libsecret-1-dev dbus gnome-keyring
       - run: cargo +1.97 fmt --all -- --check
       - run: cargo +1.97 clippy --locked --workspace --all-targets --all-features -- -D warnings
       - name: Verify reviewed local execution evidence (does not execute namespace tests)
@@ -33,3 +41,15 @@ jobs:
       - name: Run portable tests; namespace acceptance is a separate local execution
         run: node --experimental-strip-types scripts/acceptance/portable.mts
       - run: cargo +1.97 test --locked --workspace --doc --all-features
+      - name: Verify isolated Linux keyring custody against the actual provider
+        run: bash scripts/acceptance/linux-keyring.sh
+  dependency-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - run: rustup toolchain install 1.97 --profile minimal
+      - run: cargo +1.97 install cargo-audit --version 0.22.2 --locked --no-default-features
+      - run: cargo +1.97 audit --deny warnings

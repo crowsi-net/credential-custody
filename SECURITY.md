@@ -1,5 +1,12 @@
 # Security boundary
 
+## Linux Secret Service
+
+The optional Linux broker adapter delegates persistence, encryption and unlock to
+the selected OS provider through GNOME’s `libsecret` Rust binding. The DPAPI/CNG guarantees below describe
+the Windows provider, not this Linux backend. See [Linux custody](docs/linux-credential-custody.md)
+for dependency selection, runtime prerequisites, failure handling and limitations.
+
 ## 現在保証すること
 
 - DPAPIはCurrentUser scopeだけを使用し、LocalMachine scopeへfallbackしません。
