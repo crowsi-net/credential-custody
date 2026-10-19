@@ -1,5 +1,12 @@
 # Local execution and remote source review
 
+Linux Secret Service acceptance additionally runs
+`bash scripts/acceptance/linux-keyring.sh` against a temporary DBus and GNOME
+Keyring. The portable runner does not count this separate provider target as run;
+the local receipt and CI execute it explicitly, including its normally ignored
+tests with zero filtered/ignored results. Required tools must already be present
+locally; CI installs its own provider prerequisites. No host keyring is modified.
+
 The owner selects local Linux execution followed by remote push for tests needing
 user/mount/PID/network namespaces. Standard GitHub-hosted CI runs portable tests,
 formatting, Clippy, doctests and receipt consistency; it does not claim to have

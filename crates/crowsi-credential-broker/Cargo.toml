@@ -30,6 +30,13 @@ sha2 = "0.10.9"
 thiserror = "2.0.18"
 zeroize = "=1.8.2"
 
+[features]
+linux-secret-service = ["dep:oo7", "dep:tokio"]
+
+[target.'cfg(target_os = "linux")'.dependencies]
+oo7 = { version = "0.6.0", default-features = false, features = ["tokio", "native_crypto"], optional = true }
+tokio = { version = "1.50", features = ["rt", "time"], optional = true }
+
 [dev-dependencies]
 tempfile = "3.27.0"
 
@@ -48,3 +55,8 @@ path = "tests/harnesses/contracts.rs"
 [[test]]
 name = "ipc"
 path = "tests/harnesses/ipc.rs"
+
+[[test]]
+name = "linux-secret-service"
+path = "tests/linux_secret_service.rs"
+required-features = ["linux-secret-service"]

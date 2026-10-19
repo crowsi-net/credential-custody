@@ -24,6 +24,8 @@ mod entry;
 mod error;
 mod ipc;
 mod lease;
+#[cfg(all(target_os = "linux", feature = "linux-secret-service"))]
+mod linux_store;
 mod model;
 mod platform_custody_store;
 mod secret;
@@ -44,6 +46,8 @@ pub use ipc::{
     enrollment_body_sha256,
 };
 pub use lease::{LeaseGrant, LeaseReceipt, LeaseToken, SecretUse};
+#[cfg(all(target_os = "linux", feature = "linux-secret-service"))]
+pub use linux_store::LinuxCustodyStore;
 pub use model::{AccessRequest, SecretRef, SecretScope};
 pub use platform_custody_store::PlatformCustodyStore;
 pub use secret::SecretValue;

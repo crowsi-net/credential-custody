@@ -33,3 +33,18 @@ jobs:
       - name: Run portable tests; namespace acceptance is a separate local execution
         run: node --experimental-strip-types scripts/acceptance/portable.mts
       - run: cargo +1.97 test --locked --workspace --doc --all-features
+      - name: Verify isolated Linux keyring custody against the actual provider
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends dbus gnome-keyring
+          bash scripts/acceptance/linux-keyring.sh
+  dependency-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - run: rustup toolchain install 1.97 --profile minimal
+      - run: cargo +1.97 install cargo-audit --version 0.22.2 --locked --no-default-features
+      - run: cargo +1.97 audit --deny warnings

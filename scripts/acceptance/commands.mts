@@ -3,7 +3,8 @@ export const commands = [
   ['cargo', '+1.97', 'clippy', '--locked', '--workspace', '--all-targets', '--all-features', '--', '-D', 'warnings'],
   ['cargo', '+1.97', 'test', '--locked', '-p', 'crowsi-device-credential-agent', '--test', 'production_bootstrap', '--all-features'],
   ['node', '--experimental-strip-types', 'scripts/acceptance/portable.mts'],
-  ['cargo', '+1.97', 'test', '--locked', '--workspace', '--doc', '--all-features']
+  ['cargo', '+1.97', 'test', '--locked', '--workspace', '--doc', '--all-features'],
+  ['bash', 'scripts/acceptance/linux-keyring.sh']
 ] as const
 
 export function successfulTests(output: string): number {

@@ -30,4 +30,5 @@ Each crate README and examples describe its public API. Tests and examples use s
 source-bound local namespace acceptance before push and normal PR merge.
 
 Dependency updates: [repository policy](docs/dependency-updates.md).
+Linux credential storage: [OS provider delegation and fault handling](docs/linux-credential-custody.md).
 Registry releases: [version tags and GitHub OIDC](docs/registry-release.md).
