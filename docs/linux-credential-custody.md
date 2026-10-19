@@ -30,6 +30,12 @@ No Crowsi file backend, custom cipher/KDF or plaintext-storage fallback is used.
 
 ## Use and trust boundary
 
+Linux-only consumers select `default-features = false` and
+`features = ["linux-secret-service"]`. The default `windows-custody` feature
+preserves the Windows adapter, without forcing its dependencies into Linux-only
+applications. Compatible zeroize releases are allowed rather than pinning a
+shared dependency to an older patch release.
+
 ```rust,no_run
 use crowsi_credential_broker::{LinuxCustodyStore, Result};
 fn connect() -> Result<()> {

@@ -333,7 +333,7 @@ dependencies = [
 
 [[package]]
 name = "crowsi-windows-custody-provider"
-version = "0.10.2"
+version = "0.10.3"
 dependencies = [
  "base64 0.23.1",
  "crowsi-windows-operation-contracts",
