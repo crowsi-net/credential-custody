@@ -218,7 +218,7 @@ dependencies = [
 
 [[package]]
 name = "crowsi-credential-broker"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "crowsi-control-contracts",
  "crowsi-windows-custody-provider",
@@ -333,7 +333,7 @@ dependencies = [
 
 [[package]]
 name = "crowsi-windows-custody-provider"
-version = "0.10.2"
+version = "0.10.3"
 dependencies = [
  "base64 0.23.1",
  "crowsi-windows-operation-contracts",

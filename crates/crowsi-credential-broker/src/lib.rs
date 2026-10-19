@@ -27,6 +27,7 @@ mod lease;
 #[cfg(all(target_os = "linux", feature = "linux-secret-service"))]
 mod linux_store;
 mod model;
+#[cfg(feature = "windows-custody")]
 mod platform_custody_store;
 mod secret;
 mod status;
@@ -37,6 +38,7 @@ mod validation;
 pub use binding::{BindingField, BulkRevocationReceipt, LeaseBinding, RevocationSelector};
 pub use broker::{Broker, MAX_ACTIVE_LEASES};
 pub use clock::{Clock, SystemClock};
+#[cfg(feature = "windows-custody")]
 pub use crowsi_windows_custody_provider::RuntimeConfig as PlatformCustodyConfigV1;
 pub use entry::{CredentialEntry, CredentialMetadata, CredentialRevision};
 pub use error::{BrokerError, CustodyAvailabilityError, Result};
@@ -49,6 +51,7 @@ pub use lease::{LeaseGrant, LeaseReceipt, LeaseToken, SecretUse};
 #[cfg(all(target_os = "linux", feature = "linux-secret-service"))]
 pub use linux_store::LinuxCustodyStore;
 pub use model::{AccessRequest, SecretRef, SecretScope};
+#[cfg(feature = "windows-custody")]
 pub use platform_custody_store::PlatformCustodyStore;
 pub use secret::SecretValue;
 pub use status::{CredentialHealth, CredentialStatus, StatusScope};

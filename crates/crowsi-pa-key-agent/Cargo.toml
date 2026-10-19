@@ -22,7 +22,7 @@ owner-local-bootstrap = ["bootstrap-authorizer-internal"]
 [dependencies]
 base64 = "0.23.1"
 ciborium = "0.2.2"
-crowsi-credential-broker = { version = "=0.1.1", path = "../crowsi-credential-broker" }
+crowsi-credential-broker = { version = "=0.1.2", path = "../crowsi-credential-broker" }
 crowsi-credential-authority-contracts = { version = "=0.10.0", path = "../crowsi-credential-authority-contracts" }
 crowsi-local-control-bridge = { version = "=0.1.0" }
 crowsi-windows-operation-contracts = { version = "=0.1.0", path = "../crowsi-windows-operation-contracts" }

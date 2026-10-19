@@ -58,6 +58,7 @@ pub(crate) fn decode(
     Ok(CredentialEntry::restore(metadata, SecretValue::new(bytes)?))
 }
 
+#[cfg(any(feature = "windows-custody", test))]
 pub(crate) fn revision(reference: &SecretRef, payload: &str) -> Result<String> {
     Ok(decode(reference, None, payload)?
         .metadata()
@@ -66,6 +67,7 @@ pub(crate) fn revision(reference: &SecretRef, payload: &str) -> Result<String> {
         .to_owned())
 }
 
+#[cfg(any(feature = "windows-custody", test))]
 pub(crate) fn confirm_write(
     reference: &SecretRef,
     expected_revision: &str,

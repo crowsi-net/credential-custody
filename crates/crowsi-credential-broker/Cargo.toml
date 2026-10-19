@@ -1,7 +1,7 @@
 [package]
 exclude = ["/registration/**", "/state/**", "/.local/**", "/.state/**", "/.data/**", "/secrets/**", "/credentials/**", "/.env", "/.env.production", "/.env.local", "/*.tgz", "/*.tar.gz", "/*.tar", "/*.zip", "/*.whl", "/*.crate", "/.ruff_cache/**", "/.mypy_cache/**", "/.tox/**", "/.nox/**", "/.hypothesis/**", "/.coverage", "/.coverage.*", "/htmlcov/**", "/lcov.info", "/junit.xml", "/*.profraw", "/*.profdata", "/*.egg-info/**", "/target/**", "/node_modules/**", "/dist/**", "/build/**", "/.cache/**", "/.pytest_cache/**", "/coverage/**"]
 name = "crowsi-credential-broker"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 rust-version = "1.97"
 description = "Fail-closed local credential references, leases, and metadata-only status contracts"
@@ -20,7 +20,7 @@ status-contains-secret-values = false
 
 [dependencies]
 crowsi-control-contracts = { version = "=0.1.0" }
-crowsi-windows-custody-provider = { version = "=0.10.2", path = "../crowsi-windows-custody-provider" }
+crowsi-windows-custody-provider = { version = "=0.10.3", path = "../crowsi-windows-custody-provider", optional = true }
 getrandom = "0.3.4"
 hex = "0.4.3"
 nix = { version = "0.29.0", features = ["poll"] }
@@ -28,9 +28,11 @@ serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.145"
 sha2 = "0.10.9"
 thiserror = "2.0.18"
-zeroize = "=1.8.2"
+zeroize = "1.8.2"
 
 [features]
+default = ["windows-custody"]
+windows-custody = ["dep:crowsi-windows-custody-provider"]
 linux-secret-service = ["dep:libsecret", "dep:glib", "dep:gio"]
 
 [target.'cfg(target_os = "linux")'.dependencies]
