@@ -26,7 +26,7 @@ test-support = []
 [dependencies]
 crowsi-credential-broker = { version = "=0.1.2", path = "../crowsi-credential-broker" }
 crowsi-local-control-bridge = { version = "=0.1.0" }
-nix = { version = "0.29.0", features = ["poll"] }
+nix = { version = "0.31.3", features = ["poll"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.145"
 sha2 = "0.10.9"
