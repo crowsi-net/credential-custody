@@ -47,7 +47,7 @@ fn helper(script: &str) -> (PathBuf, ProcessIdentity) {
     let path = root.join("pa-helper");
     fs::write(&path, script).expect("write helper");
     fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).expect("helper mode");
-    let digest = format!("sha256:{:x}", Sha256::digest(script.as_bytes()));
+    let digest = format!("sha256:{}", hex::encode(Sha256::digest(script.as_bytes())));
     let identity =
         ProcessIdentity::open(path.to_str().expect("path"), &digest).expect("pinned helper");
     (root, identity)

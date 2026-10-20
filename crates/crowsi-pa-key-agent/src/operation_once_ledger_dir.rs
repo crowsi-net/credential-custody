@@ -1,7 +1,7 @@
 use std::{
     fs::{self, File, OpenOptions},
     io::Read,
-    os::{fd::AsRawFd, unix::fs::OpenOptionsExt},
+    os::unix::fs::OpenOptionsExt,
     path::{Path, PathBuf},
 };
 
@@ -86,12 +86,8 @@ impl LedgerDir {
     }
 
     pub(crate) fn remove(&self, name: &str) -> Result<()> {
-        nix::unistd::unlinkat(
-            Some(self.file.as_raw_fd()),
-            name,
-            nix::unistd::UnlinkatFlags::NoRemoveDir,
-        )
-        .map_err(|_| PaKeyError::State)?;
+        nix::unistd::unlinkat(&self.file, name, nix::unistd::UnlinkatFlags::NoRemoveDir)
+            .map_err(|_| PaKeyError::State)?;
         self.sync()
     }
 

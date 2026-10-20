@@ -91,7 +91,7 @@ impl AuthorityTransport for RemoteAuthorityTransport {
 
     fn exchange(&self, command: &str, request: &[u8], now: u64) -> Result<Vec<u8>, AgentError> {
         let mut random = [0_u8; 32];
-        getrandom::getrandom(&mut random).map_err(|_| AgentError::AuthorityUnavailable)?;
+        getrandom::fill(&mut random).map_err(|_| AgentError::AuthorityUnavailable)?;
         self.client
             .exchange(command, request, &hex::encode(random), now)
             .map_err(|_| AgentError::AuthorityUnavailable)

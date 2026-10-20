@@ -46,11 +46,11 @@ impl ProcessIdentity {
             .map_err(|_| AgentError::AuthorityUnavailable)?;
         let exact = bytes.len() <= MAXIMUM_EXECUTABLE_BYTES as usize
             && StableMetadata::from(&after) == expected
-            && format!("sha256:{:x}", Sha256::digest(&bytes)) == digest;
+            && format!("sha256:{}", hex::encode(Sha256::digest(&bytes))) == digest;
         if !exact {
             return Err(AgentError::ConfigInvalid);
         }
-        fcntl(file.as_raw_fd(), FcntlArg::F_SETFD(FdFlag::empty()))
+        fcntl(&file, FcntlArg::F_SETFD(FdFlag::empty()))
             .map_err(|_| AgentError::AuthorityUnavailable)?;
         Ok(Self {
             file,

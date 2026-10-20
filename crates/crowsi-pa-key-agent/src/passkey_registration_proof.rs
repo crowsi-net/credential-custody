@@ -91,7 +91,7 @@ mod tests {
     #[test]
     fn accepts_the_w3c_es256_high_s_assertion_vector() {
         let private = bytes("6fd2149bb5f1597fe549b138794bde61893b2dc32ca316de65f04808dac211dc");
-        let signing = SigningKey::from_bytes(private.as_slice().into()).expect("private key");
+        let signing = SigningKey::from_slice(private.as_slice()).expect("private key");
         let public = signing.verifying_key().to_public_key_der().expect("SPKI");
         let challenge = "7x3rpW3OSPZ0pEfM9juVmSWM6HZI5cOW8u8ModpGDjs";
         let proof = PasskeyChallengeV1 {

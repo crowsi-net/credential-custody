@@ -48,12 +48,11 @@ impl HelperIdentity {
         if before.dev() != after.dev()
             || before.ino() != after.ino()
             || before.len() != after.len()
-            || format!("sha256:{:x}", Sha256::digest(&bytes)) != digest
+            || format!("sha256:{}", hex::encode(Sha256::digest(&bytes))) != digest
         {
             return Err(ReasonCode::HelperRejected.into());
         }
-        fcntl(file.as_raw_fd(), FcntlArg::F_SETFD(FdFlag::empty()))
-            .map_err(|_| ReasonCode::HelperRejected)?;
+        fcntl(&file, FcntlArg::F_SETFD(FdFlag::empty())).map_err(|_| ReasonCode::HelperRejected)?;
         Ok(Self {
             file,
             device: after.dev(),

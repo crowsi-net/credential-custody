@@ -19,7 +19,7 @@ pub fn registration_auth_data_with_count(rp_id: &str, signing: &SigningKey, coun
     let id_length = u16::try_from(credential_id.len()).expect("credential id length");
     value.extend_from_slice(&id_length.to_be_bytes());
     value.extend_from_slice(credential_id);
-    let point = signing.verifying_key().to_encoded_point(false);
+    let point = signing.verifying_key().to_sec1_point(false);
     let bytes = point.as_bytes();
     value.extend_from_slice(&[0xa5, 0x01, 0x02, 0x03, 0x26, 0x20, 0x01]);
     value.extend_from_slice(&[0x21, 0x58, 0x20]);

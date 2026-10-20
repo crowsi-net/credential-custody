@@ -1,8 +1,4 @@
-use std::{
-    fs::OpenOptions,
-    io::Write,
-    os::{fd::AsRawFd, unix::fs::OpenOptionsExt},
-};
+use std::{fs::OpenOptions, io::Write, os::unix::fs::OpenOptionsExt};
 
 use nix::fcntl::{RenameFlags, renameat, renameat2};
 
@@ -59,19 +55,14 @@ pub(crate) fn rename_temporary(
     name: &str,
     exists: bool,
 ) -> Result<()> {
-    let fd = directory.file.as_raw_fd();
+    let fd = &directory.file;
     let renamed = if exists {
-        renameat(
-            Some(fd),
-            crate::operation_once_ledger_dir::TEMP_NAME,
-            Some(fd),
-            name,
-        )
+        renameat(fd, crate::operation_once_ledger_dir::TEMP_NAME, fd, name)
     } else {
         renameat2(
-            Some(fd),
+            fd,
             crate::operation_once_ledger_dir::TEMP_NAME,
-            Some(fd),
+            fd,
             name,
             RenameFlags::RENAME_NOREPLACE,
         )

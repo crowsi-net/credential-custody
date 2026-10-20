@@ -35,7 +35,7 @@ pub(crate) fn open(
     if !host_open_file::same(&before, &after) || crate::host_crypto::digest(&wire) != digest {
         return Err(HostError::PathInvalid);
     }
-    fcntl(file.as_raw_fd(), FcntlArg::F_SETFD(FdFlag::empty()))
+    fcntl(&file, FcntlArg::F_SETFD(FdFlag::empty()))
         .map_err(|_| HostError::PathInvalid)?;
     let proc_path = format!("/proc/self/fd/{}", file.as_raw_fd());
     Ok(PinnedFile { file, proc_path })

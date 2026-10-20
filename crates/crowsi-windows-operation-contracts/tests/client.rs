@@ -20,7 +20,7 @@ fn helper_is_fd_pinned_and_rejects_changed_digest() {
     let body = b"#!/bin/sh\nexit 0\n";
     fs::write(&helper, body).expect("write");
     fs::set_permissions(&helper, fs::Permissions::from_mode(0o700)).expect("mode");
-    let digest = format!("sha256:{:x}", Sha256::digest(body));
+    let digest = format!("sha256:{}", hex::encode(Sha256::digest(body)));
     HelperIdentity::new(&helper, &digest).expect("pinned");
     assert_eq!(
         HelperIdentity::new(&helper, format!("sha256:{}", "0".repeat(64)))
