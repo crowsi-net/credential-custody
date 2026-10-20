@@ -14,15 +14,15 @@ publish = false
 [dependencies]
 crowsi-credential-authority-contracts = { version = "=0.10.0", path = "../crowsi-credential-authority-contracts" }
 ed25519-dalek = "=3.0.0"
-getrandom = "=0.2.17"
+getrandom = "=0.4.3"
 hex = "=0.4.3"
 ihat-identity-assertion-contracts = { version = "=0.10.0" }
-pbkdf2 = "=0.12.2"
+pbkdf2 = "=0.13.0"
 serde = { version = "=1.0.229", features = ["derive"] }
 serde_json = "=1.0.151"
-sha2 = "=0.10.9"
+sha2 = "=0.11.1"
 unicode-normalization = "=0.1.25"
-zeroize = { version = "=1.8.2", features = ["derive"] }
+zeroize = { version = "=1.9.1", features = ["derive"] }
 
 [dev-dependencies]
 tempfile = "=3.27.0"

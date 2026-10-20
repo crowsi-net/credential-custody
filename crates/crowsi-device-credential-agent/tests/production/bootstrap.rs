@@ -64,7 +64,7 @@ impl Installation {
         );
         config["session_sender_private_key_path"] = "/case/sender.json".into();
         config["session_sender_private_key_sha256"] =
-            format!("sha256:{:x}", Sha256::digest(&sender)).into();
+            format!("sha256:{}", hex::encode(Sha256::digest(&sender))).into();
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .expect("isolated bootstrap setup")

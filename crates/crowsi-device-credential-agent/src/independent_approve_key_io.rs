@@ -1,25 +1,17 @@
 use nix::{
-    fcntl::{AtFlags, OFlag, openat},
+    fcntl::{AT_FDCWD, AtFlags, OFlag, openat},
     sys::stat::{FileStat, Mode, SFlag, fstat, fstatat},
-    unistd::{close, read as fd_read},
+    unistd::read as fd_read,
 };
 use std::{
     fs::{self, OpenOptions},
-    os::{fd::AsRawFd, unix::fs::OpenOptionsExt},
+    os::unix::fs::OpenOptionsExt,
     path::Path,
 };
 
 use crate::AgentError;
 
 const MAXIMUM_BYTES: usize = 4_096;
-
-struct Descriptor(i32);
-
-impl Drop for Descriptor {
-    fn drop(&mut self) {
-        let _ = close(self.0);
-    }
-}
 
 pub(super) fn read(path: &str, uid: u32) -> Result<Vec<u8>, AgentError> {
     let path = Path::new(path);
@@ -36,29 +28,26 @@ pub(super) fn read(path: &str, uid: u32) -> Result<Vec<u8>, AgentError> {
         .open(parent)
         .map_err(|_| AgentError::PathInvalid)?;
     let named_directory =
-        fstatat(None, parent, AtFlags::AT_SYMLINK_NOFOLLOW).map_err(|_| AgentError::PathInvalid)?;
-    let opened_directory = fstat(directory.as_raw_fd()).map_err(|_| AgentError::PathInvalid)?;
+        fstatat(AT_FDCWD, parent, AtFlags::AT_SYMLINK_NOFOLLOW).map_err(|_| AgentError::PathInvalid)?;
+    let opened_directory = fstat(&directory).map_err(|_| AgentError::PathInvalid)?;
     valid_directory(&opened_directory, uid)?;
     if !same(&named_directory, &opened_directory) {
         return Err(AgentError::PathInvalid);
     }
     let before = fstatat(
-        Some(directory.as_raw_fd()),
+        &directory,
         name,
         AtFlags::AT_SYMLINK_NOFOLLOW,
     )
     .map_err(|_| AgentError::PathInvalid)?;
     valid(&before, uid)?;
-    let descriptor = Descriptor(
-        openat(
-            Some(directory.as_raw_fd()),
-            name,
-            OFlag::O_RDONLY | OFlag::O_NOFOLLOW | OFlag::O_CLOEXEC,
-            Mode::empty(),
-        )
-        .map_err(|_| AgentError::PathInvalid)?,
-    );
-    let opened = fstat(descriptor.0).map_err(|_| AgentError::PathInvalid)?;
+    let descriptor = openat(
+        &directory,
+        name,
+        OFlag::O_RDONLY | OFlag::O_NOFOLLOW | OFlag::O_CLOEXEC,
+        Mode::empty(),
+    ).map_err(|_| AgentError::PathInvalid)?;
+    let opened = fstat(&descriptor).map_err(|_| AgentError::PathInvalid)?;
     if !same(&before, &opened) {
         return Err(AgentError::PathInvalid);
     }
@@ -67,26 +56,26 @@ pub(super) fn read(path: &str, uid: u32) -> Result<Vec<u8>, AgentError> {
     let mut offset = 0;
     while offset < wire.len() {
         let count =
-            fd_read(descriptor.0, &mut wire[offset..]).map_err(|_| AgentError::PathInvalid)?;
+            fd_read(&descriptor, &mut wire[offset..]).map_err(|_| AgentError::PathInvalid)?;
         if count == 0 {
             return Err(AgentError::PathInvalid);
         }
         offset += count;
     }
     let mut trailing = [0_u8; 1];
-    if fd_read(descriptor.0, &mut trailing).map_err(|_| AgentError::PathInvalid)? != 0 {
+    if fd_read(&descriptor, &mut trailing).map_err(|_| AgentError::PathInvalid)? != 0 {
         return Err(AgentError::PathInvalid);
     }
-    let after = fstat(descriptor.0).map_err(|_| AgentError::PathInvalid)?;
+    let after = fstat(&descriptor).map_err(|_| AgentError::PathInvalid)?;
     let path_after = fstatat(
-        Some(directory.as_raw_fd()),
+        &directory,
         name,
         AtFlags::AT_SYMLINK_NOFOLLOW,
     )
     .map_err(|_| AgentError::PathInvalid)?;
-    let directory_after = fstat(directory.as_raw_fd()).map_err(|_| AgentError::PathInvalid)?;
+    let directory_after = fstat(&directory).map_err(|_| AgentError::PathInvalid)?;
     let named_directory_after =
-        fstatat(None, parent, AtFlags::AT_SYMLINK_NOFOLLOW).map_err(|_| AgentError::PathInvalid)?;
+        fstatat(AT_FDCWD, parent, AtFlags::AT_SYMLINK_NOFOLLOW).map_err(|_| AgentError::PathInvalid)?;
     (same(&opened, &after)
         && same(&after, &path_after)
         && same(&opened_directory, &directory_after)

@@ -9,7 +9,10 @@ fn canonical_absolute_helper_is_pinned_and_detects_replacement() {
     let helper = root.path().join("helper.exe");
     fs::write(&helper, b"synthetic executable bytes").expect("fixture");
     let helper = helper.canonicalize().expect("canonical helper");
-    let digest = format!("sha256:{:x}", Sha256::digest(b"synthetic executable bytes"));
+    let digest = format!(
+        "sha256:{}",
+        hex::encode(Sha256::digest(b"synthetic executable bytes"))
+    );
     assert!(HelperIdentity::new(&helper, &digest).is_ok());
     fs::write(&helper, b"replaced bytes").expect("replace fixture");
     assert!(HelperIdentity::new(&helper, &digest).is_err());

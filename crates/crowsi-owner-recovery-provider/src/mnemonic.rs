@@ -1,4 +1,4 @@
-use getrandom::getrandom;
+use getrandom::fill;
 use sha2::{Digest, Sha256};
 use unicode_normalization::UnicodeNormalization;
 use zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing};
@@ -40,7 +40,7 @@ pub struct GeneratedRecoveryRoot {
 /// cryptographic random source is unavailable.
 pub fn generate() -> Result<GeneratedRecoveryRoot, RecoveryError> {
     let mut entropy = Zeroizing::new([0_u8; ENTROPY_BYTES]);
-    getrandom(entropy.as_mut()).map_err(|_| RecoveryError::EntropyUnavailable)?;
+    fill(entropy.as_mut()).map_err(|_| RecoveryError::EntropyUnavailable)?;
     Ok(GeneratedRecoveryRoot {
         mnemonic: RecoveryMnemonic(Zeroizing::new(encode(&entropy))),
     })

@@ -11,7 +11,7 @@ pub(crate) fn public(value: u8) -> String {
 }
 
 pub(crate) fn digest(value: &[u8]) -> String {
-    format!("sha256:{:x}", Sha256::digest(value))
+    format!("sha256:{}", hex::encode(Sha256::digest(value)))
 }
 
 pub(crate) fn sign(domain: &str, value: &mut Value, key: &SigningKey) -> Vec<u8> {

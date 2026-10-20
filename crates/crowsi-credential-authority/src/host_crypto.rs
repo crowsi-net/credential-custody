@@ -54,7 +54,7 @@ pub(crate) fn sign(key: &SigningKey, payload: &[u8]) -> String {
 }
 
 pub(crate) fn digest(value: &[u8]) -> String {
-    format!("sha256:{:x}", Sha256::digest(value))
+    format!("sha256:{}", hex::encode(Sha256::digest(value)))
 }
 
 pub(crate) fn provider_payload(kind: &str, payload: &[u8]) -> Vec<u8> {
