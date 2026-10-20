@@ -160,7 +160,8 @@ dependencies = [
 [[package]]
 name = "crowsi-authority-transport"
 version = "0.2.0"
-source = "git+https://github.com/crowsi-net/crowsi-transport-foundation?rev=30bcd1e14cad837755cfc524097ca6133d32c8d3#30bcd1e14cad837755cfc524097ca6133d32c8d3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f643a5cee65ce352a87bbef119d49843d84561059d8f1c24e26691ffec5575ff"
 dependencies = [
  "ed25519-dalek 3.0.0",
  "hex",
@@ -168,7 +169,7 @@ dependencies = [
  "rustls-pki-types",
  "serde",
  "serde_json",
- "sha2 0.10.9",
+ "sha2 0.11.1",
  "zeroize",
 ]
 

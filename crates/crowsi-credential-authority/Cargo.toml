@@ -16,7 +16,7 @@ test-support = []
 
 
 [dependencies]
-crowsi-authority-transport = { version = "=0.2.0", git = "https://github.com/crowsi-net/crowsi-transport-foundation", rev = "30bcd1e14cad837755cfc524097ca6133d32c8d3" }
+crowsi-authority-transport = "=0.2.0"
 crowsi-credential-authority-contracts = { version = "=0.10.0", path = "../crowsi-credential-authority-contracts" }
 ed25519-dalek = "=3.0.0"
 hex = "=0.4.3"
