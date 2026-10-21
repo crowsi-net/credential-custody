@@ -1,3 +1,4 @@
+use super::directory::tempdir;
 use crowsi_windows_custody_provider::{
     FileNonceLedger, OPERATION_AUTHORIZATION_SCHEMA, OPERATION_REQUEST_SCHEMA, OperationBinding,
     OperationContext, OperationOnlyAction, OperationOnlyCredentialClass, OperationOnlyDispatcher,
@@ -8,7 +9,7 @@ use ihat_identity_assertion_contracts::{
     CurrentDeviceStatusV1, DevicePostureV1, RevocationEpochsV1,
 };
 use std::sync::{Arc, atomic::AtomicUsize};
-use tempfile::{TempDir, tempdir};
+use tempfile::TempDir;
 
 use super::{FakeStore, FakeVerifier, FakeWindowsPort};
 

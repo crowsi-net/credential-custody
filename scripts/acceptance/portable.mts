@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process'
 import { notExecuted } from './profile.mts'
+if (process.platform !== 'win32') process.umask(0o077)
 const agent = 'crowsi-device-credential-agent'
 const broker = 'crowsi-credential-broker'
 const windows = notExecuted[0].package

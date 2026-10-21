@@ -1,3 +1,4 @@
+pub mod directory;
 mod fake;
 mod fixture;
 
