@@ -12,8 +12,6 @@ mod challenge_lifetime;
 mod current_device_status_authorization;
 #[path = "../device_identity_authorization.rs"]
 mod device_identity_authorization;
-#[path = "../github_observer_authorization.rs"]
-mod github_observer_authorization;
 #[path = "../initialization.rs"]
 mod initialization;
 #[path = "../instance_isolation.rs"]
@@ -42,3 +40,5 @@ mod passkey_registration_windows;
 mod passkey_stale_rebind;
 #[path = "../passkey_stale_rebind_rejection.rs"]
 mod passkey_stale_rebind_rejection;
+#[path = "../retired_provider_authorization.rs"]
+mod retired_provider_authorization;
