@@ -790,7 +790,7 @@
     "crates/crowsi-pa-key-agent/tests/challenge_lifetime.rs",
     "crates/crowsi-pa-key-agent/tests/current_device_status_authorization.rs",
     "crates/crowsi-pa-key-agent/tests/device_identity_authorization.rs",
-    "crates/crowsi-pa-key-agent/tests/github_observer_authorization.rs",
+    "crates/crowsi-pa-key-agent/tests/retired_provider_authorization.rs",
     "crates/crowsi-pa-key-agent/tests/harnesses/authorization.rs",
     "crates/crowsi-pa-key-agent/tests/harnesses/destruction.rs",
     "crates/crowsi-pa-key-agent/tests/initialization.rs",

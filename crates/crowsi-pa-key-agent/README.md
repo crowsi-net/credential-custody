@@ -11,6 +11,12 @@ Manage policy-administrator signing keys and expose only their approved public s
 
 The operator chooses private state and custody configuration. Private key material must not enter public projections.
 
+The built-in credential-authorization policy permits credential enrollment only.
+Provider-observation requests are rejected before creating a challenge or signing
+an envelope. The retired application-specific GitHub observer is not a generic
+provider contract. Existing credentials, external App registrations, trust stores
+and previously issued grants are not revoked by this source change.
+
 Package distribution is not activated by this documentation. Use the owning product workspace and declared dependency versions. Registry availability is a separate release gate.
 
 ## Getting started

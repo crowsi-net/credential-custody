@@ -18,13 +18,6 @@ pub(crate) fn require(request: &ControlRequestV1) -> Result<ControlAuthorization
                 actor_profile_id: "profile-credential-operator",
             }
         }
-        BridgeAction::ObserveProvider if github_observation(request) => {
-            ControlAuthorizationPolicy {
-                operation: "github-provider-observe",
-                workload_id: "spiffe://crowsi/local/coela-github-app",
-                actor_profile_id: "profile-github-observer-operator",
-            }
-        }
         _ => return Err(PaKeyError::Authorization),
     };
     if request.schema != "crowsi://local-control/request/v1"
@@ -43,23 +36,6 @@ fn credential_enrollment(value: &ControlRequestV1) -> bool {
         && value.resource[11..]
             .bytes()
             .all(|byte| byte.is_ascii_digit() || matches!(byte, b'a'..=b'f'))
-}
-
-fn github_observation(value: &ControlRequestV1) -> bool {
-    const PREFIX: &str = "crowsi://credentials/github-app/";
-    value.purpose == "github-app-jwt-signing"
-        && value
-            .resource
-            .strip_prefix(PREFIX)
-            .is_some_and(|credential| {
-                !credential.is_empty() && credential.len() <= 128 && component(credential)
-            })
-}
-
-fn component(value: &str) -> bool {
-    value
-        .bytes()
-        .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_' | b'.'))
 }
 
 fn identifier(value: &str) -> bool {
