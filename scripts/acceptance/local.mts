@@ -11,6 +11,7 @@ const mode = process.argv[2]
 if (process.argv.length !== 3 || !['run', 'verify', 'push'].includes(mode ?? '')) throw Error('Usage: local.mts run|verify|push')
 clean()
 if (mode === 'run') {
+  process.umask(0o077) // Only this owned process and its children; never the caller's session.
   if (process.platform !== 'linux' || process.getuid?.() === 0) throw Error('Use a non-root Linux account; no sudo or host changes')
   const tests = readdirSync('scripts/acceptance').filter(name => name.endsWith('.test.mts')).sort()
   if (!tests.length) throw Error('Acceptance policy tests missing')

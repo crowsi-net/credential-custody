@@ -38,6 +38,7 @@ impl Fixture {
         // Private ancestry is part of the production trust boundary: /tmp is unsuitable.
         let private_directory = tempfile::Builder::new()
             .prefix(".authority-host-")
+            .permissions(fs::Permissions::from_mode(0o700))
             .tempdir_in(std::env::current_dir().expect("current directory"))
             .expect("owner-private fixture");
         let root = private_directory.path().to_path_buf();

@@ -42,3 +42,14 @@ fn op_07_malformed_oversize_trailing_and_tampered_inputs_are_rejected() {
 fn device_a_revocation_does_not_invalidate_device_b() {
     cases::device_scoped_revocation();
 }
+
+#[cfg(unix)]
+#[test]
+fn writable_nonce_parent_is_denied() {
+    use crowsi_windows_custody_provider::FileNonceLedger;
+    use std::{fs, os::unix::fs::PermissionsExt};
+    let root = support::directory::tempdir().expect("private parent");
+    FileNonceLedger::open(root.path().join("nonces")).expect("private ledger");
+    fs::set_permissions(root.path(), fs::Permissions::from_mode(0o770)).expect("writable parent");
+    assert!(FileNonceLedger::open(root.path().join("other-nonces")).is_err());
+}

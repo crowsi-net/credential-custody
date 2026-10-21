@@ -3,12 +3,12 @@ use std::sync::{
     atomic::{AtomicUsize, Ordering},
 };
 
+use super::support::directory::tempdir;
 use crowsi_windows_custody_provider::{
     DurableOperationNonceLedger, FileNonceLedger, MAX_OPERATION_INPUT_BYTES,
     OperationLedgerBinding, OperationOnlyAction, OperationOnlyCredentialClass as Class, ReasonCode,
     decode_operation_request,
 };
-use tempfile::tempdir;
 
 use super::{digest, ed25519, failure, support};
 

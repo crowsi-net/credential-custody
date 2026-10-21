@@ -15,6 +15,7 @@ impl Fixture {
         let serial = PROCESS_TESTS.lock().expect("provider process test lock");
         // Production trust rejects writable /tmp ancestors; retain private checkout ancestry.
         let root = tempfile::Builder::new().prefix("vpremises-provider-process-")
+            .permissions(fs::Permissions::from_mode(0o700))
             .tempdir_in(std::env::current_dir().expect("current directory"))
             .expect("private provider fixture");
         let pidfile = root.path().join("child.pid");
@@ -24,6 +25,8 @@ impl Fixture {
         let compiler = std::env::var_os("RUSTC").unwrap_or_else(|| "rustc".into());
         assert!(Command::new(compiler).arg("--edition=2024").arg(&source)
             .arg("-o").arg(&executable).status().expect("compile provider").success());
+        // Never inherit a permissive caller umask for an executable trusted by the host.
+        fs::set_permissions(&executable, fs::Permissions::from_mode(0o700)).expect("executable mode");
         let config = root.path().join("provider.json");
         fs::write(&config, format!("{scenario}\n{}", pidfile.display())).expect("config");
         fs::set_permissions(&config, fs::Permissions::from_mode(0o600)).expect("config mode");

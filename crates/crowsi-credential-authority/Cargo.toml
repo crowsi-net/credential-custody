@@ -21,7 +21,7 @@ crowsi-credential-authority-contracts = { version = "=0.10.0", path = "../crowsi
 ed25519-dalek = "=3.0.0"
 hex = "=0.4.3"
 getrandom = "=0.3.4"
-libc = "=0.2.190"
+libc = "=0.2.191"
 ihat-identity-assertion-contracts = { version = "=0.10.0" }
 nix = { version = "0.31.3", features = ["fs", "process", "signal", "user"] }
 serde = { version = "=1.0.229", features = ["derive"] }
