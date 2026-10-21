@@ -15,6 +15,7 @@ impl Fixture {
         let serial = PROCESS_TESTS.lock().expect("provider process test lock");
         // Production trust rejects writable /tmp ancestors; retain private checkout ancestry.
         let root = tempfile::Builder::new().prefix("vpremises-provider-process-")
+            .permissions(fs::Permissions::from_mode(0o700))
             .tempdir_in(std::env::current_dir().expect("current directory"))
             .expect("private provider fixture");
         let pidfile = root.path().join("child.pid");
