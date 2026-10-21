@@ -13,6 +13,19 @@ fn provider_empty_stderr_is_valid_and_output_is_bounded() {
 }
 
 #[test]
+fn writable_provider_executable_is_refused_before_spawn() {
+    use std::os::unix::fs::PermissionsExt;
+    let fixture = Fixture::new("finite");
+    fs::set_permissions(&fixture.route.executable, fs::Permissions::from_mode(0o770))
+        .expect("writable executable");
+    assert!(matches!(
+        host_provider_process::exchange(&fixture.route, "reissue", b"{}"),
+        Err(crate::HostError::PathInvalid)
+    ));
+    assert!(!fixture.pidfile.exists());
+}
+
+#[test]
 fn provider_parent_success_kills_grandchild_without_pipe_hang() {
     let fixture = Fixture::new("grandchild-success");
     let started = Instant::now();
