@@ -51,3 +51,6 @@ __pycache__/
 /*.profraw
 /*.profdata
 /*.egg-info/
+
+# Owner-private transient test state; not build output or real credentials.
+**/.crowsi-test-*/

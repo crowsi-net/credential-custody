@@ -3,6 +3,8 @@ use crowsi_device_credential_agent::{
     AgentError, canonical_signed_document, test_support::AgentCore,
 };
 
+#[path = "support/private_directory.rs"]
+mod private_directory;
 use crate::management_support_config;
 use crate::management_support_identity::{FakeIdentity, provider};
 use crate::management_support_projection::projection;
@@ -26,6 +28,7 @@ pub struct Fixture {
     projection_key: SigningKey,
     transport: FakeTransport,
     identity: FakeIdentity,
+    _directory: tempfile::TempDir,
     _isolation: MutexGuard<'static, ()>,
 }
 
@@ -39,15 +42,8 @@ impl Fixture {
         let isolation = FIXTURE_ISOLATION
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
-        let nonce = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .expect("time")
-            .as_nanos();
-        let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("target/crowsi-v6-tests");
-        fs::create_dir_all(&base).expect("test root");
-        fs::set_permissions(&base, fs::Permissions::from_mode(0o700)).expect("test root mode");
-        let root = base.join(format!("crowsi-v6-{}-{nonce}", std::process::id()));
-        fs::create_dir(&root).expect("state");
+        let directory = private_directory::create("management");
+        let root = directory.path().to_path_buf();
         let state = root.join("state");
         let anchor = root.join("anchor");
         fs::create_dir(&state).expect("state directory");
@@ -78,6 +74,7 @@ impl Fixture {
             projection_key,
             transport: FakeTransport::new(binding),
             identity: provider(),
+            _directory: directory,
             _isolation: isolation,
         }
     }
@@ -131,12 +128,6 @@ impl Fixture {
         self.root.join("recovery-approval/key.json")
     }
 }
-impl Drop for Fixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.root);
-    }
-}
-
 include!("management_support_lookup.rs");
 include!("management_support_cancellation_fixture.rs");
 include!("management_support_guard.rs");

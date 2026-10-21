@@ -6,11 +6,14 @@ use std::{
 };
 
 use crate::{AgentError, replay::DurableLedger};
+#[path = "../tests/support/private_directory.rs"]
+mod private_directory;
 
 pub(super) struct Fixture {
     pub state: PathBuf,
     pub anchor: PathBuf,
     uid: u32,
+    _directory: tempfile::TempDir,
     _isolation: MutexGuard<'static, ()>,
 }
 
@@ -31,14 +34,8 @@ impl Fixture {
         let isolation = FIXTURE_ISOLATION
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
-        let nonce = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .expect("time")
-            .as_nanos();
-        let base = Path::new(env!("CARGO_MANIFEST_DIR")).join("target/crowsi-ledger-tests");
-        fs::create_dir_all(&base).expect("test root");
-        fs::set_permissions(&base, fs::Permissions::from_mode(0o700)).expect("test root mode");
-        let root = base.join(format!("crowsi-ledger-{}-{nonce}", std::process::id()));
+        let directory = private_directory::create("ledger");
+        let root = directory.path().to_path_buf();
         let state = root.join("state");
         let anchor = root.join("anchor");
         fs::create_dir_all(&state).expect("state");
@@ -51,6 +48,7 @@ impl Fixture {
             state,
             anchor,
             uid,
+            _directory: directory,
             _isolation: isolation,
         }
     }
@@ -80,14 +78,6 @@ impl Fixture {
             generation,
             "test-ledger",
         )
-    }
-}
-
-impl Drop for Fixture {
-    fn drop(&mut self) {
-        if let Some(root) = self.state.parent() {
-            let _ = fs::remove_dir_all(root);
-        }
     }
 }
 
