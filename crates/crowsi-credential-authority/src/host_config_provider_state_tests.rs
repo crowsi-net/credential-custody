@@ -68,6 +68,7 @@ fn route(state: &str) -> HostProviderRoute {
 fn unique(name: &str) -> tempfile::TempDir {
     tempfile::Builder::new()
         .prefix(&format!("vpremises-{name}-"))
+        .permissions(fs::Permissions::from_mode(0o700))
         .tempdir_in(std::env::current_dir().expect("current directory"))
         .expect("private state fixture")
 }
