@@ -1,0 +1,15 @@
+{
+  "schema": "source-consolidation-v1",
+  "owner_repository": "crowsi-net/credential-custody",
+  "components": [
+    {
+      "id": "vpremises-credential",
+      "original_repository": "vpremises/vpremises-credential",
+      "source_head": "b329f0ddfca44497a06abb56b23efb47428be7fc",
+      "subpath": ".",
+      "owner_repository": "crowsi-net/credential-custody",
+      "retired_archive_sha256": "cd81e73c3242538de81752e39648e56614cd0f20c4256dfdde553fd633811592"
+    }
+  ],
+  "status": "Current source is maintained only in this owner. Original repository/revision and retired archive digest are provenance only; archive restoration is retired. Current manifests and owner workflows define publication; public availability is verified separately."
+}

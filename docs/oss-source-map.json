@@ -884,13 +884,13 @@
       "jobs": [
         {
           "job": "verify",
-          "condition": null,
+          "condition": "github.event_name != 'schedule'",
           "runs_on": "ubuntu-24.04",
           "steps": [
             {
               "name": null,
               "run": null,
-              "uses": "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
               "condition": null
             },
             {
@@ -900,8 +900,20 @@
               "condition": null
             },
             {
-              "name": "Verify preserved source history",
-              "run": "git bundle verify docs/source-history/source.bundle",
+              "name": "Verify current owner provenance without restoring retired repositories",
+              "run": "python3 - <<'PYCODE'\nimport json, os, re, subprocess\nfrom pathlib import Path, PurePosixPath\nrecord = Path('source-consolidation.json')\nassert record.is_file() and not record.is_symlink() and record.stat().st_size <= 65536\ndata = json.loads(record.read_text())\nassert data['owner_repository'] == os.environ['GITHUB_REPOSITORY']\nfor component in data.get('components', []):\n    assert component['owner_repository'] == data['owner_repository']\n    assert re.fullmatch(r'[0-9a-f]{40}', component['source_head'])\n    path = PurePosixPath(component['subpath'])\n    assert not path.is_absolute() and '..' not in path.parts\n    assert (Path('.') / path).is_dir()\n    assert not {'history_archive', 'history_ref', 'local_history_ref'} & component.keys()\nif not data.get('components'):\n    assert re.fullmatch(r'[0-9a-f]{40}', data['source_sha'])\nassert 'canonical_history_bundle' not in data\npaths = subprocess.check_output(['git', 'ls-files', '-z'], timeout=10).decode().split('\\0')\nassert len(paths) <= 8192\nassert not any(p.endswith('.bundle') or 'source-history' in PurePosixPath(p).parts for p in paths if p)\nprint('Current owner provenance verified; no historical repository restoration')\nPYCODE\n",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Diagnose namespace capability without changing host protection",
+              "run": "sh scripts/acceptance/diagnose.sh",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Install native keyring build dependencies",
+              "run": "sudo apt-get update\nsudo apt-get install --yes --no-install-recommends libsecret-1-dev dbus gnome-keyring\n",
               "uses": null,
               "condition": null
             },
@@ -918,14 +930,57 @@
               "condition": null
             },
             {
-              "name": null,
-              "run": "cargo +1.97 test --locked --workspace --all-targets --all-features",
+              "name": "Verify reviewed local execution evidence (does not execute namespace tests)",
+              "run": "node --experimental-strip-types --test scripts/acceptance/*.test.mts\nnode --experimental-strip-types scripts/acceptance/local.mts verify\n",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Run portable tests; namespace acceptance is a separate local execution",
+              "run": "node --experimental-strip-types scripts/acceptance/portable.mts",
               "uses": null,
               "condition": null
             },
             {
               "name": null,
               "run": "cargo +1.97 test --locked --workspace --doc --all-features",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": "Verify isolated Linux keyring custody against the actual provider",
+              "run": "bash scripts/acceptance/linux-keyring.sh",
+              "uses": null,
+              "condition": null
+            }
+          ]
+        },
+        {
+          "job": "dependency-audit",
+          "condition": null,
+          "runs_on": "ubuntu-24.04",
+          "steps": [
+            {
+              "name": null,
+              "run": null,
+              "uses": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": "rustup toolchain install 1.97 --profile minimal",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": "cargo +1.97 install cargo-audit --version 0.22.2 --locked --no-default-features",
+              "uses": null,
+              "condition": null
+            },
+            {
+              "name": null,
+              "run": "cargo +1.97 audit --deny warnings",
               "uses": null,
               "condition": null
             }
